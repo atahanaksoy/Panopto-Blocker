@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+
+  "name": "Panopto Blocker",
+  "description": "This extension blocks the annoying 15 second display of Panopto.",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "activeTab",
+    "<all_urls>",
+    "tabs"
+  ],
+  "background": {
+    "scripts": ["script.js"]
+  },
+  "web_accessible_resources": ["Viewer.js", "script.js"]
+}

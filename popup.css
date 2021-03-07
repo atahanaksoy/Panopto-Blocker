@@ -1,0 +1,10 @@
+html,body {
+  background-color: white;
+  width: 200px;
+}
+
+
+.headline {
+  font-size: 16px;
+  color: #243141;
+}
