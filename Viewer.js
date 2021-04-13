@@ -1562,9 +1562,8 @@ var PanoptoLegacy = (Panopto = Panopto || {});
   (Panopto.Core = Panopto.Core || {}),
   (Panopto.Core.PlayResumption = Panopto.Core.PlayResumption || {});
 var Silverlight = Silverlight;
-(Panopto.Viewer.Viewer = function (e, t, n, o, i, a) {
-  var r,
-    s,
+(Panopto.Viewer.Viewer = function (e, t, n, o, i, a, r) {
+  var s,
     l,
     c,
     d,
@@ -1595,79 +1594,80 @@ var Silverlight = Silverlight;
     U,
     M,
     H,
-    B = PanoptoCore.Logging.Logger,
-    F = PanoptoTS.Viewer.Constants,
-    N = (PanoptoTS.Viewer.Data, Panopto.Core.ErrorCode),
-    z = new PanoptoCore.Logging.CircularBufferTransport({
+    B,
+    F = PanoptoCore.Logging.Logger,
+    N = PanoptoTS.Viewer.Constants,
+    z = (PanoptoTS.Viewer.Data, Panopto.Core.ErrorCode),
+    G = new PanoptoCore.Logging.CircularBufferTransport({
       loglevel: PanoptoCore.Logging.LogLevel.Verbose,
-      bufferSize: F.CircularLogBufferSize,
+      bufferSize: N.CircularLogBufferSize,
     }),
-    G = $.Deferred(),
-    j = !1,
-    Q = [],
-    q = new PanoptoTS.Viewer.Controls.ManualFullScreenStateControlGroup(),
-    W = Panopto.Core.StringHelpers.parseQueryString(
+    j = $.Deferred(),
+    Q = !1,
+    q = [],
+    W = new PanoptoTS.Viewer.Controls.ManualFullScreenStateControlGroup(),
+    K = Panopto.Core.StringHelpers.parseQueryString(
       window.location.search.slice(1)
     ),
-    K = "true" === W.edit,
-    J = W.tid,
-    Y = !!W.notes,
-    X = parseInt(W.start, 10),
-    Z = !1,
-    ee = Panopto.Viewer.PlayState.Paused,
-    te = 0,
+    J = "true" === K.edit,
+    Y = K.tid,
+    X = !!K.notes,
+    Z = parseInt(K.start, 10),
+    ee = !1,
+    te = Panopto.Viewer.PlayState.Paused,
     ne = 0,
     oe = 0,
-    ie = !1,
-    ae = !0,
-    re = !1,
+    ie = 0,
+    ae = !1,
+    re = !0,
     se = !1,
-    le = !0,
-    ce = !1,
-    de = new PanoptoTS.Viewer.Viewer.PageElements(),
-    ue = PanoptoCore.CookieHelpers.getUserCookieField(
+    le = !1,
+    ce = !0,
+    de = !1,
+    ue = new PanoptoTS.Viewer.Viewer.PageElements(),
+    pe = PanoptoCore.CookieHelpers.getUserCookieField(
       Panopto.user.userKey,
-      F.VolumeCookie
+      N.VolumeCookie
     ),
-    pe = !1,
-    fe = new PanoptoTS.Viewer.Logic.DefaultPlayerSelectionLogic({
-      isEditor: K,
+    fe = !1,
+    he = new PanoptoTS.Viewer.Logic.DefaultPlayerSelectionLogic({
+      isEditor: J,
       playerHelpers: e,
     }),
-    he =
+    me =
       '<div class="' +
-      F.SecondaryPlayerClass +
+      N.SecondaryPlayerClass +
       ' player"><div class="secondaryContent"></div></div>',
-    me = "true" === W.startMuted;
-  W.outcome_did &&
-    (H = { outcomeId: W.outcome_did, oauthConsumerKey: W.oauth_consumer_key });
-  var ve,
-    ye,
-    Pe = Panopto.Core.StringHelpers.parseQueryString(
+    ve = "true" === K.startMuted;
+  K.outcome_did &&
+    (B = { outcomeId: K.outcome_did, oauthConsumerKey: K.oauth_consumer_key });
+  var ye,
+    Pe,
+    ge = Panopto.Core.StringHelpers.parseQueryString(
       window.location.hash.slice(1)
     ),
-    ge = Pe.debug
+    Se = ge.debug
       ? new PanoptoTS.Viewer.Controls.MockSessions(
           Panopto.Core.ServiceInterface.Rest.Sessions
         )
       : Panopto.Core.ServiceInterface.Rest.Sessions,
-    Se = new PanoptoTS.Viewer.EditorRouter(
+    Ce = new PanoptoTS.Viewer.EditorRouter(
       function () {
-        (P.isViewable = P.isReadyForEditing),
-          (P.isRecentBroadcast = !1),
-          (P.multiBitrateEnabled = !1),
-          v && v.deregisterCallbacks(),
-          (v = Panopto.Viewer.Controls.Timeline.TimelineEditor(
-            Pe,
-            e,
-            g,
-            P,
+        (g.isViewable = g.isReadyForEditing),
+          (g.isRecentBroadcast = !1),
+          (g.multiBitrateEnabled = !1),
+          y && y.deregisterCallbacks(),
+          (y = Panopto.Viewer.Controls.Timeline.TimelineEditor(
             ge,
+            e,
+            S,
+            g,
+            Se,
             function () {
               (e.resize = void 0),
-                Ie(),
-                v.overlayController.ready.then(function () {
-                  V.show(), e.resize();
+                ke(),
+                y.overlayController.ready.then(function () {
+                  I.show(), e.resize();
                 });
             }
           ));
@@ -1677,50 +1677,50 @@ var Silverlight = Silverlight;
           "<a href='#'>{0}</a>",
           Panopto.GlobalResources.ViewerPlus_Edit_ForceReprocess
         );
-        ke(t);
+        Re(t);
         var n = $("#messageText a");
         Panopto.Core.UI.Handlers.button(n, function () {
           e.toggleScreens(!1),
             Panopto.Application.defaultInstance.updateState({
               modalPage: "SessionManage",
-              modalHeader: Panopto.Core.TextHelpers.innerText(P.title),
+              modalHeader: Panopto.Core.TextHelpers.innerText(g.title),
               modalParams: Panopto.Core.StringHelpers.serializeObjectToQueryString(
-                { id: P.id }
+                { id: g.id }
               ),
             });
         });
       },
       function () {
         window.location.href = Panopto.Core.StringHelpers.format(
-          F.SilverlightEditorUrlTemplate,
-          P.id
+          N.SilverlightEditorUrlTemplate,
+          g.id
         );
       },
       function () {
-        ke(Panopto.GlobalResources.ViewerPlus_Edit_UnsupportedBrowser);
+        Re(Panopto.GlobalResources.ViewerPlus_Edit_UnsupportedBrowser);
       },
       function () {
-        ke(Panopto.GlobalResources.ViewerPlus_Edit_SessionNotReady);
+        Re(Panopto.GlobalResources.ViewerPlus_Edit_SessionNotReady);
       },
       function () {
-        ke(
+        Re(
           Panopto.GlobalResources
             .ViewerPlus_Edit_PendingEditedTranscriptionRequest
         );
       },
       function () {
-        R.hide(),
-          Panopto.Viewer.Header(e, P, void 0, void 0, void 0, t),
+        D.hide(),
+          Panopto.Viewer.Header(e, g, void 0, void 0, void 0, t),
           new Panopto.EditorProcessing($("#processing"), {
             resources: Panopto.GlobalResources,
-            delivery: P,
+            delivery: g,
             deliveryThumbnailUrl: Panopto.viewer.data.thumbnailUrl,
           });
       }
     ),
-    Ce = function (t) {
-      var n = (s && s.visible()) || we();
-      (ve === t && ye === n) ||
+    we = function (t) {
+      var n = (l && l.visible()) || be();
+      (ye === t && Pe === n) ||
         ((t && n) ||
           ($(".plugin-screen").css({
             "max-height": t ? "" : 0,
@@ -1728,49 +1728,49 @@ var Silverlight = Silverlight;
             overflow: t ? "" : "hidden",
           }),
           e.resize && e.resize()),
-        (ve = t),
-        (ye = n));
+        (ye = t),
+        (Pe = n));
     },
-    we = function () {
+    be = function () {
       return Panopto.Core.StringHelpers.parseQueryString(window.location.hash)
         .modalPage;
     },
-    be = function (t, n) {
+    Te = function (t, n) {
       var o;
-      ne = n = "number" == typeof n ? n : Math.max(te, e.position());
-      var r,
-        d,
-        y,
-        g,
-        C,
+      oe = n = "number" == typeof n ? n : Math.max(ne, e.position());
+      var i,
+        s,
+        u,
+        P,
+        S,
         w,
         b,
-        A = Date.now(),
-        E = u.streamLength(),
-        V = v ? v.timelinePosition(t, n) : n,
-        R = P.firstQuizOffset;
+        T = Date.now(),
+        E = p.streamLength(),
+        V = y ? y.timelinePosition(t, n) : n,
+        I = g.firstQuizOffset;
       if (
-        P.hasQuiz &&
+        g.hasQuiz &&
         Panopto.viewer.showQuizWarning &&
         !Panopto.user.userId &&
-        !ce &&
-        R + 0.1 > n &&
-        R - 0.1 < n
+        !de &&
+        I + 0.1 > n &&
+        I - 0.1 < n
       ) {
-        e.setPlayState(a.Paused, !0, !1), (ce = !0);
+        e.setPlayState(r.Paused, !0, !1), (de = !0);
         var D = Panopto.Core.StringHelpers.parseQueryString(
             window.location.search.slice(1)
           ).tid,
-          O = P.user.email || null,
+          x = g.user.email || null,
           U = $("#proViewerSignupPopup");
         Panopto.SignupPromptPopup(U, {
           onClose: function () {
-            U.hide(), e.setPlayState(a.Playing, !0, !1);
+            U.hide(), e.setPlayState(r.Playing, !0, !1);
           },
           position: n,
           signupUrl: Panopto.freeTrialSignUpUrl,
           token: D,
-          email: O,
+          email: x,
           sendGoogleAnalytics: function (e, t) {
             return Panopto.GoogleAnalytics.sendProEvent(e, t);
           },
@@ -1778,95 +1778,95 @@ var Silverlight = Silverlight;
         });
       }
       if (V !== n)
-        V === v.timelineEndPosition() &&
-          (e.setPlayState(a.Paused, void 0, void 0),
+        V === y.timelineEndPosition() &&
+          (e.setPlayState(r.Paused, void 0, void 0),
           (V -= PanoptoTS.Viewer.Constants.EditorTimelineEndOffsetSeconds)),
           e.setPosition(V);
       else if (
         (E > 0 &&
-          x !== E &&
-          ((x = E),
-          _.each(Q, function (e) {
+          L !== E &&
+          ((L = E),
+          _.each(q, function (e) {
             _.each(e.getTabs(), function (e) {
-              e.adjustTimeline(x);
+              e.adjustTimeline(L);
             });
           })),
-        (n = Math.clamp(n, 0, x)),
-        (r = Math.round(n)),
-        (d = Math.max(0, Math.round(x - n))),
-        m.synchronize(n, oe, t, !!v))
+        (n = Math.clamp(n, 0, L)),
+        (i = Math.round(n)),
+        (s = Math.max(0, Math.round(L - n))),
+        v.synchronize(n, ie, t, !!y))
       ) {
-        S.state.playerState.position != n &&
-          S.setState({ playerState: { position: n } }),
-          h && h.position(n),
-          (t || !L || A - L > F.ControlSyncRate) &&
-            ((L = A),
-            (y = Panopto.Core.TimeHelpers.formatDuration(
-              r,
+        C.state.playerState.position != n &&
+          C.setState({ playerState: { position: n } }),
+          m && m.position(n),
+          (t || !O || T - O > N.ControlSyncRate) &&
+            ((O = T),
+            (u = Panopto.Core.TimeHelpers.formatDuration(
+              i,
               Panopto.GlobalResources.TimeSeparator
             )),
-            (g =
-              (d ? "-" : "") +
+            (P =
+              (s ? "-" : "") +
               Panopto.Core.TimeHelpers.formatDuration(
-                d,
+                s,
                 Panopto.GlobalResources.TimeSeparator
               )),
-            (C = Panopto.Core.TimeHelpers.formatDuration(
-              Math.round(x),
+            (S = Panopto.Core.TimeHelpers.formatDuration(
+              Math.round(L),
               Panopto.GlobalResources.TimeSeparator
             )),
-            l.synchronize(n, x, y, g, C)),
-          v && v.synchronize(n, ee === a.Playing),
-          q.syncTimes(y, C),
-          P.multiBitrateEnabled && l.synchronizeBitrate(),
-          c && c.updateProgress(n),
-          u.isEndedBy(n) &&
-            ((w = P.isBroadcast && !ae),
+            c.synchronize(n, L, u, P, S)),
+          y && y.synchronize(n, te === r.Playing),
+          W.syncTimes(u, S),
+          g.multiBitrateEnabled && c.synchronizeBitrate(),
+          d && d.updateProgress(n),
+          p.isEndedBy(n) &&
+            ((w = g.isBroadcast && !re),
             (b = function () {
               Panopto.viewer.data.playlist
-                ? s.queueNextItem()
-                : (!P.nextDelivery && !w) || v
-                ? v ||
+                ? l.queueNextItem()
+                : (!g.nextDelivery && !w) || y
+                ? y ||
                   e.isActiveBroadcast() ||
                   (e.setPosition(0),
                   Panopto.Core.Browser.isIE11 &&
-                    (e.setPlayState(a.Playing, !1, !1),
-                    e.setPlayState(a.Paused, !1, !1)))
+                    (e.setPlayState(r.Playing, !1, !1),
+                    e.setPlayState(r.Paused, !1, !1)))
                 : (w
-                    ? ((re = !0), k.text(T))
+                    ? ((se = !0), R.text(A))
                     : (e.setPosition(0),
-                      (P.nextDelivery.folderName = P.folder.name),
+                      (g.nextDelivery.folderName = g.folder.name),
                       Panopto.Core.UI.Components.nextDelivery(
-                        k,
-                        P.nextDelivery,
+                        R,
+                        g.nextDelivery,
                         Panopto.GlobalResources.NextDelivery_NextVideo,
                         Panopto.GlobalResources.NextDelivery_PlayAgain,
                         function () {
-                          e.setPlayState(a.Playing, void 0, void 0);
+                          e.setPlayState(r.Playing, void 0, void 0);
                         },
                         Panopto.GlobalResources.NextDelivery_RecordingNow
                       )),
-                  I.show(),
-                  Ce(!1));
+                  k.show(),
+                  we(!1));
             }),
-            e.setPlayState(a.Paused, !0, !0),
-            P.requiresSilverlight ? setTimeout(b, 100) : b());
+            e.setPlayState(r.Paused, !0, !0),
+            g.requiresSilverlight ? setTimeout(b, 100) : b());
         var M = document.getElementById("primaryVideo"),
           H =
             (null === (o = null == M ? void 0 : M.textTracks) || void 0 === o
               ? void 0
               : o.length) > 0;
-        l.synchronizeCaption(H),
+        c.synchronizeCaption(H),
           (function (t) {
             var n,
               o,
-              a,
+              i,
               r = e.fullscreenPlayer();
-            P.captions &&
-              l.captionsSelected() &&
+            g.captions &&
+              c.captionsSelected() &&
               (o =
-                P.captions[
-                  _.findLastIndex(P.captions, function (e) {
+                g.captions[
+                  _.findLastIndex(g.captions, function (e) {
                     return e.time < t;
                   })
                 ]);
@@ -1874,93 +1874,96 @@ var Silverlight = Silverlight;
             (null === (n = null == s ? void 0 : s.textTracks) || void 0 === n
               ? void 0
               : n.length) > 0 &&
-              P.isBroadcast &&
-              (!P.hasCaptions && l.captionsSelected()
+              g.isBroadcast &&
+              (!g.hasCaptions && c.captionsSelected()
                 ? (s.textTracks[0].mode = "showing")
                 : (s.textTracks[0].mode = "disabled")),
-              (a = o ? o.text : ""),
+              (i = o ? o.text : ""),
               r
                 ? r.getCaptionControl() &&
-                  r.getCaptionControl().setCaptionText(a)
-                : l.captionsDocked()
-                ? (p && p.setCaptionText(""), f && f.setCaptionText(""))
-                : e.viewMode() === i.Secondary
-                ? (p && p.setCaptionText(""), f && f.setCaptionText(a))
-                : p && p.setCaptionText(a),
-              e.resizeCaption(a, l.captionsDocked());
+                  r.getCaptionControl().setCaptionText(i)
+                : c.captionsDocked()
+                ? (f && f.setCaptionText(""), h && h.setCaptionText(""))
+                : e.viewMode() === a.Secondary
+                ? (f && f.setCaptionText(""), h && h.setCaptionText(i))
+                : f && f.setCaptionText(i),
+              e.resizeCaption(i, c.captionsDocked());
           })(n);
       }
-      oe = ne;
+      ie = oe;
     },
-    Te = function (t) {
-      var i = X;
+    Ae = function (t) {
+      var n = Z;
       Panopto.Core.Browser.isIE &&
         Panopto.Application.defaultInstance.showNotificationBanner(
           Panopto.GlobalResources.DeprecateInternetExplorer11,
           null,
           !0
         ),
-        isNaN(i) &&
+        isNaN(n) &&
           void 0 === Panopto.viewer.data.playlist &&
-          void 0 === v &&
-          (i = Panopto.Core.PlayResumption.calculateStartTime(
-            P.lastViewingPosition,
-            P.duration
+          void 0 === y &&
+          (n = Panopto.Core.PlayResumption.calculateStartTime(
+            g.lastViewingPosition,
+            g.duration
           )),
         Panopto.viewer.disableSeekAndVsp &&
           Panopto.viewer.enableSeekAndVspAfterPercentage &&
-          P.completionPercentage &&
-          P.completionPercentage >
+          g.completionPercentage &&
+          g.completionPercentage >
             Panopto.viewer.enableSeekAndVspAfterPercentage &&
-          e.reportPercentCompleted(P.completionPercentage),
-        (v && !t) || V.show(),
+          e.reportPercentCompleted(g.completionPercentage),
+        (y && !t) || I.show(),
         (function (t) {
-          if (!u) {
+          if (!p) {
             var n = $("#primaryScreen");
-            if (Panopto.viewer.showBrandWhilePlaying) {
-              var i = new PanoptoViewer.WatermarkLogo(
-                !0,
-                Panopto.branding.embedLogo.png
+            if (Panopto.viewer.viewerWatermarkPosition) {
+              var o = new PanoptoViewer.WatermarkLogo(
+                Panopto.branding.embedLogo.png,
+                Panopto.viewer.viewerWatermarkPosition
               );
-              $("#primaryPlayer .letterbox").append(i.getBrandElem());
+              $("#primaryPlayer .letterbox").append(o.getBrandElem()),
+                Panopto.viewer.viewerWatermarkPosition ===
+                  PanoptoViewer.Data.ViewerWatermarkPositionOptions.TopRight &&
+                  o.setOffset(50);
             }
-            var a = fe.getPlayerFactory(P),
+            var a = he.getPlayerFactory(g),
               r = new PanoptoTS.Viewer.Players.AudioOnlyOverlay();
             r.getElement().insertAfter(n),
               r.onClick.add(function () {
-                e.togglePlaying(o.Labels.Normal);
+                e.togglePlaying(i.Labels.Normal);
               }),
               r.onShowOverlay.add(function () {
-                v.streamTab().showUploadOverlay({ secondaryOnly: !1 });
+                y.streamTab().showUploadOverlay({ secondaryOnly: !1 });
               }),
-              (u = v
+              (p = y
                 ? PanoptoLegacy.Viewer.Players.PrimarySegmentPlayer(
-                    de.getPrimaryPlayer(),
+                    ue.getPrimaryPlayer(),
                     n,
                     a,
                     e,
-                    v,
+                    y,
                     r
                   )
                 : PanoptoLegacy.Viewer.Players.PrimaryPlayer(
-                    de.getPrimaryPlayer(),
+                    ue.getPrimaryPlayer(),
                     n,
                     a,
                     e,
-                    P,
+                    g,
                     r
                   )),
-              P.primaryStreams.length && e.reloadPrimaryContent(!0, t),
-              (p = u.getCaptionControl()),
-              u.getFullscreenStateControl() &&
-                q.add(u.getFullscreenStateControl());
+              g.primaryStreams.length && e.reloadPrimaryContent(!0, t),
+              (f = p.getCaptionControl()),
+              p.getFullscreenStateControl() &&
+                W.add(p.getFullscreenStateControl());
           }
-        })(i),
-        S.setState({ eventTabLogic: Ee() }),
-        (O = new PanoptoTS.Viewer.StandardPlayerLayout(
-          de,
-          u,
-          Q
+        })(n),
+        C.setState({ eventTabLogic: Ve() }),
+        (U = new PanoptoTS.Viewer.StandardPlayerLayout(
+          ue,
+          p,
+          q
         )).onSecondaryLayoutChanged.add(function (t) {
           var n;
           switch (t) {
@@ -1975,99 +1978,115 @@ var Silverlight = Silverlight;
           }
           e.setSecondaryCount(n);
         });
-      var d = new PanoptoTS.Viewer.Controls.PlayerLayoutControls(v);
+      var a = new PanoptoTS.Viewer.Controls.PlayerLayoutControls(y);
       if (
-        (d.onShowOverlay.add(function () {
-          v.streamTab().showUploadOverlay({ secondaryOnly: !1 });
+        (a.onShowOverlay.add(function () {
+          y.streamTab().showUploadOverlay({ secondaryOnly: !1 });
         }),
-        (l = Panopto.Viewer.PlayControls(e, P, u, ue, de, O, Q, d, !!v)),
+        (c = Panopto.Viewer.PlayControls(e, g, p, pe, ue, U, q, a, !!y)),
         (function () {
           e.setSecondaryCount(1),
-            h || v || (h = n.ThumbnailPlayer(P.thumbnails, e));
-          var t = _.filter(P.documents, function (e) {
+            m || y || (m = o.ThumbnailPlayer(g.thumbnails, e));
+          var t = _.filter(g.documents, function (e) {
             return e.isQuiz;
           });
-          new PanoptoTS.Viewer.QuizResultsController(t, H).onQuizCompleted(
+          new PanoptoTS.Viewer.QuizResultsController(t, B).onQuizCompleted(
             function () {
               return e.togglePlaying();
             }
           );
         })(),
-        PanoptoLegacy.Viewer.Layout(e, g, de, O, u, Q, P, r, !1, v),
-        (x = P.isBroadcast ? 0 : P.duration),
+        PanoptoLegacy.Viewer.Layout(e, S, ue, U, p, q, g, s, !1, y),
+        (L = g.isBroadcast ? 0 : g.duration),
         !Panopto.viewer.allowMultipleSecondaryDisplay)
       )
-        for (var f = 0, m = Q; f < m.length; f++) {
-          m[f].getTabControl().attachTabHandlers();
+        for (var u = 0, h = q; u < h.length; u++) {
+          h[u].getTabControl().attachTabHandlers();
         }
-      W.isScorm && (c = Panopto.Viewer.ScormControl(e, P.duration)),
-        me && !u.isMuted() && e.toggleMuted();
-      var y = A && !Panopto.viewer.data.playlist ? a.Playing : a.Paused;
-      e.setPlayState(y, void 0, void 0),
-        !i || c || v ? c || be(!0, null) : e.setPosition(i),
+      K.isScorm && (d = Panopto.Viewer.ScormControl(e, g.duration)),
+        ve && !p.isMuted() && e.toggleMuted();
+      var v = E && !Panopto.viewer.data.playlist ? r.Playing : r.Paused,
+        P = $("#ltiQuizBlock");
+      Panopto.LTIQuizBlock(P, {
+        deliveryId: g.id,
+        sessionHasQuiz: g.hasQuiz,
+        ltiBlockSetting:
+          PanoptoViewer.LTIQuizBlockingMode[
+            Panopto.viewer.blockLTISessionsWithQuiz
+          ],
+        ltiQueryParam: K.outcome_did,
+        checkBlockSessionOnQuizReporting:
+          Panopto.Core.ServiceInterface.Rest.Sessions
+            .blockSessionOnQuizReporting,
+        onPopupResolved: function () {
+          P.hide(), e.setPlayState(v, void 0, void 0);
+        },
+        resources: Panopto.GlobalResources,
+      }),
+        !n || d || y ? d || Te(!0, null) : e.setPosition(n),
         Panopto.Core.Browser.isIE &&
           $(document).on("contextmenu", function () {
-            e.setPlayState(a.Paused, void 0, void 0);
+            e.setPlayState(r.Paused, void 0, void 0);
           }),
-        e.toggleScreens(!we()),
-        E &&
-          !A &&
-          (l.toggleAutoplayMessage(!0),
-          s &&
+        e.toggleScreens(!be()),
+        V &&
+          !E &&
+          (c.toggleAutoplayMessage(!0),
+          l &&
             setTimeout(function () {
-              s.hide();
-            }, s.autoHideDelay)),
-        (ie = !0);
+              l.hide();
+            }, l.autoHideDelay)),
+        (ae = !0);
     },
-    Ae = function (t) {
-      if ((R.hide(), (se = !0), t && t.ErrorCode))
+    Ee = function (t) {
+      if ((D.hide(), (le = !0), t && t.ErrorCode))
         switch (t.ErrorCode) {
-          case N.SiteDisabled:
+          case z.SiteDisabled:
             e.toggleMessage(Panopto.GlobalResources.ViewerPlus_SiteDisabled);
             break;
-          case N.LoginRequired:
-            o.sendEvent({ action: o.Actions.Prereq, label: o.Labels.Login }),
+          case z.LoginRequired:
+            i.sendEvent({ action: i.Actions.Prereq, label: i.Labels.Login }),
               (window.location.href =
                 Panopto.viewer.unauthorizedViewerTransferUrl);
             break;
-          case N.AccessRequired:
-            o.sendEvent({ action: o.Actions.Prereq, label: o.Labels.Access }),
+          case z.AccessRequired:
+            i.sendEvent({ action: i.Actions.Prereq, label: i.Labels.Access }),
               (window.location.href = t.RedirectUrl);
             break;
-          case N.InvalidUrl:
+          case z.InvalidUrl:
             e.toggleMessage(
               Panopto.GlobalResources.ViewerPlus_InvalidUrl,
               Panopto.GlobalResources.ViewerPlus_WatchSomethingElse,
-              F.SessionListUrl
+              N.SessionListUrl
             );
             break;
-          case N.InvalidDelivery:
+          case z.InvalidDelivery:
             e.toggleMessage(
               Panopto.GlobalResources.ViewerPlus_InvalidDelivery,
               Panopto.GlobalResources.ViewerPlus_WatchSomethingElse,
-              F.SessionListUrl
+              N.SessionListUrl
             );
             break;
-          case N.NotInAvailabilityWindow:
+          case z.NotInAvailabilityWindow:
             e.toggleMessage(
               Panopto.GlobalResources.ViewerPlus_NotInAvailabilityWindow,
               Panopto.GlobalResources.ViewerPlus_WatchSomethingElse,
-              F.SessionListUrl
+              N.SessionListUrl
             );
             break;
-          case N.InvalidFormatForSSL:
+          case z.InvalidFormatForSSL:
             e.toggleMessage(
               Panopto.GlobalResources.ViewerPlus_InvalidFormatForSSL,
               Panopto.GlobalResources.ViewerPlus_WatchSomethingElse,
-              F.SessionListUrl
+              N.SessionListUrl
             );
             break;
-          case N.HasPendingMergeOrCopyJobs:
+          case z.HasPendingMergeOrCopyJobs:
             e.toggleMessage(
               Panopto.GlobalResources.ViewerPlus_HasPendingMergeOrCopyJobs
             );
             break;
-          case N.UnknownError:
+          case z.UnknownError:
           default:
             e.toggleMessage(
               Panopto.GlobalResources.ViewerPlus_UnknownError,
@@ -2085,54 +2104,54 @@ var Silverlight = Silverlight;
             )
           : e.toggleMessage(Panopto.GlobalResources.ViewerPlus_NetworkError);
     },
-    Ee = function () {
-      return K
+    Ve = function () {
+      return J
         ? new PanoptoTS.Viewer.Logic.EditorEventTabLogic(
-            P,
+            g,
             e,
-            v,
+            y,
+            Se,
             ge,
-            Pe,
             t,
             Panopto.Core.ServiceInterface.Rest.TagsRequest,
             Panopto.Core.ServiceInterface.Rest.SubscriptionRequest,
             Panopto.Core.ServiceInterface.Rest.Users
           )
-        : Y
-        ? new PanoptoTS.Viewer.Logic.LiveNotesEventTabLogic(P, e, t)
+        : X
+        ? new PanoptoTS.Viewer.Logic.LiveNotesEventTabLogic(g, e, t)
         : new PanoptoTS.Viewer.Logic.ViewerEventTabLogic(
-            P,
+            g,
             e,
-            J,
+            Y,
             t,
             Panopto.Core.ServiceInterface.Rest.TagsRequest,
             Panopto.Core.ServiceInterface.Rest.SubscriptionRequest,
             Panopto.Core.ServiceInterface.Rest.Users
           );
     },
-    Ve = function (n) {
-      se = !1;
+    _e = function (n) {
+      le = !1;
       var o,
-        a =
+        i =
           Panopto.Core.Browser.flashEnabled() &&
           !Panopto.viewer.htmlPlaybackOnly,
-        l =
+        r =
           n.flowPlayerEnabled ||
-          (!P.isBroadcast && Panopto.Core.Browser.supportsVideo(F.MP4MimeType));
+          (!g.isBroadcast && Panopto.Core.Browser.supportsVideo(N.MP4MimeType));
       if (
-        ((P = n),
-        S.setState({ delivery: P }),
-        (le = P.flowPlayerEnabled),
-        W.isScorm && (P.nextDelivery = null),
-        W.notes)
+        ((g = n),
+        C.setState({ delivery: g }),
+        (ce = g.flowPlayerEnabled),
+        K.isScorm && (g.nextDelivery = null),
+        K.notes)
       )
-        P.user.key
-          ? ((r = Panopto.Viewer.Header(e, P, void 0, void 0, void 0, t)),
-            S.setState({ eventTabLogic: Ee() }),
-            (O = new PanoptoTS.Viewer.StandardPlayerLayout(de, null, Q)),
-            PanoptoLegacy.Viewer.Layout(e, g, de, O, null, Q, P, r, !0, v),
-            e.viewMode(i.LiveNotes),
-            V.show(),
+        g.user.key
+          ? ((s = Panopto.Viewer.Header(e, g, void 0, void 0, void 0, t)),
+            C.setState({ eventTabLogic: Ve() }),
+            (U = new PanoptoTS.Viewer.StandardPlayerLayout(ue, null, q)),
+            PanoptoLegacy.Viewer.Layout(e, S, ue, U, null, q, g, s, !0, y),
+            e.viewMode(a.LiveNotes),
+            I.show(),
             Panopto.authCookieTimeoutMinutes &&
               setInterval(
                 t.refreshAuthCookie,
@@ -2142,23 +2161,23 @@ var Silverlight = Silverlight;
               Panopto.loginUrl +
               "?ReturnUrl=" +
               encodeURIComponent(window.location.href));
-      else if (P.isViewable)
+      else if (g.isViewable)
         if (
           (e.toggleMessage(void 0),
-          U && U.remove(),
-          (r = Panopto.Viewer.Header(
+          M && M.remove(),
+          (s = Panopto.Viewer.Header(
             e,
-            P,
-            A,
-            v,
+            g,
+            E,
+            y,
             Panopto.viewer.data.playlist,
             t
           )),
-          (s = r.playlistOverlay()),
-          P.requiresSilverlight)
+          (l = s.playlistOverlay()),
+          g.requiresSilverlight)
         )
-          !(o = Silverlight.isInstalled(F.SilverlightVersion)) ||
-          ("wmv" === P.activePrimary.fileType && Panopto.Core.Browser.isSafari)
+          !(o = Silverlight.isInstalled(N.SilverlightVersion)) ||
+          ("wmv" === g.activePrimary.fileType && Panopto.Core.Browser.isSafari)
             ? (o
                 ? e.toggleMessage(
                     Panopto.GlobalResources.ViewerPlus_Webkit_WMV_Warning
@@ -2170,20 +2189,20 @@ var Silverlight = Silverlight;
                     Panopto.GlobalResources.Silverlight_DisabledLink,
                     "https://support.panopto.com/ChromeSilverlight"
                   ),
-              (l || a) &&
-                P.podcastCompleted &&
+              (r || i) &&
+                g.podcastCompleted &&
                 ($("#embedControl").show(),
-                $("#embedControl").html(P.embedUrl)))
-            : Te();
-        else if (l || a) {
+                $("#embedControl").html(g.embedUrl)))
+            : Ae();
+        else if (r || i) {
           var c =
-            P.primaryStreams.some(function (e) {
+            g.primaryStreams.some(function (e) {
               return 0 !== e.vrType;
             }) ||
-            P.secondaryStreams.some(function (e) {
+            g.secondaryStreams.some(function (e) {
               return 0 !== e.vrType;
             });
-          Te(c);
+          Ae(c);
         } else
           Panopto.viewer.htmlPlaybackOnly
             ? e.toggleMessage(
@@ -2192,43 +2211,43 @@ var Silverlight = Silverlight;
             : e.toggleMessage(
                 Panopto.GlobalResources.ViewerPlus_InstallOrEnable,
                 Panopto.GlobalResources.ViewerPlus_AdobeFlashPlayer,
-                F.FlashPlayerUrl,
+                N.FlashPlayerUrl,
                 "adobe-download"
               );
       else if (
-        ((r = Panopto.Viewer.Header(
+        ((s = Panopto.Viewer.Header(
           e,
-          P,
-          A,
-          v,
+          g,
+          E,
+          y,
           Panopto.viewer.data.playlist,
           t
         )),
-        P.isBroadcast)
+        g.isBroadcast)
       ) {
-        if (!P.activePrimary && !U) {
+        if (!g.activePrimary && !M) {
           var d = Panopto.viewer.data.hasCustomThumbnail
             ? Panopto.viewer.data.thumbnailUrl
             : null;
-          (U = new PanoptoTS.Viewer.Controls.WaitingRoom(
+          (M = new PanoptoTS.Viewer.Controls.WaitingRoom(
             $("#waitingRoomContainer"),
-            P,
+            g,
             d
           )).render();
         }
-      } else _e();
+      } else Ie();
     },
-    _e = function () {
+    Ie = function () {
       var t, n;
-      P.folder.id
+      g.folder.id
         ? ((t = Panopto.GlobalResources.ViewerPlus_SessionNotReady_WatchSomethingElse.format(
-            P.folder.name
+            g.folder.name
           )),
-          (n = Panopto.Application.getBookmarkURL(F.SessionListUrl, {
-            folderID: P.folder.id,
+          (n = Panopto.Application.getBookmarkURL(N.SessionListUrl, {
+            folderID: g.folder.id,
           })))
         : ((t = Panopto.GlobalResources.ViewerPlus_WatchSomethingElse),
-          (n = F.SessionListUrl)),
+          (n = N.SessionListUrl)),
         e.toggleMessage(
           Panopto.GlobalResources.ViewerPlus_SessionNotReady +
             "<br>" +
@@ -2237,129 +2256,134 @@ var Silverlight = Silverlight;
           n
         );
     },
-    Ie = function () {
-      R.hide(), Ve(P);
+    ke = function () {
+      D.hide(), _e(g);
     },
-    ke = function (n) {
-      R.hide(),
-        (r = Panopto.Viewer.Header(e, P, void 0, void 0, void 0, t)),
+    Re = function (n) {
+      D.hide(),
+        (s = Panopto.Viewer.Header(e, g, void 0, void 0, void 0, t)),
         e.toggleMessage(
           n,
           Panopto.GlobalResources.ViewerPlus_Edit_MoreInformation,
           Panopto.viewer.editorSupportUrl
         );
     },
-    Re = function (e, t) {
+    De = function (e, t) {
       var n = t;
-      if (y)
+      if (P)
         for (
-          var o = _.findLastIndex(y, function (t) {
+          var o = _.findLastIndex(P, function (t) {
               return t.start >= e;
             }),
-            i = y[o];
+            i = P[o];
           i && i.start < e + n;
 
         )
-          (n += i.end - i.start), (i = y[++o]);
+          (n += i.end - i.start), (i = P[++o]);
       return n;
     };
   $(document).ready(function () {
-    (g = Panopto.Viewer.createViewerBridge($("#viewerBridge"))),
-      ((S = g.viewer).onEventTabFocused = function () {
+    (S = Panopto.Viewer.createViewerBridge($("#viewerBridge"))),
+      ((C = S.viewer).onEventTabFocused = function () {
         return e.expandLeftPane();
       }),
-      (S.onEventTabSelected = function () {
+      (C.onEventTabSelected = function () {
         return e.expandLeftPane();
       }),
-      new PanoptoTS.Viewer.Controls.EventPane(g);
-    var n = "true" === W.edit,
-      o = W.id;
-    !o &&
+      new PanoptoTS.Viewer.Controls.EventPane(S);
+    var o = "true" === K.edit,
+      i = K.id;
+    !i &&
       Panopto.viewer.data.playlist &&
-      (o = Panopto.viewer.data.playlist.initialDeliveryId);
-    var i = -1 !== navigator.userAgent.indexOf("Mac OS X 10_13");
-    if (n && i && Panopto.Core.Browser.isSafari) {
-      var a = {};
+      (i = Panopto.viewer.data.playlist.initialDeliveryId);
+    var a = -1 !== navigator.userAgent.indexOf("Mac OS X 10_13");
+    if (o && a && Panopto.Core.Browser.isSafari) {
+      var r = {};
       try {
-        a = JSON.parse(Panopto.viewer.hlsJsConfig);
+        r = JSON.parse(Panopto.viewer.hlsJsConfig);
       } catch (e) {
-        B.warning("Error parsing HlsJsConfig setting, ignored.");
+        F.warning("Error parsing HlsJsConfig setting, ignored.");
       }
-      Panopto.viewer.hlsJsConfig = JSON.stringify(_.extend(a, { safari: !1 }));
+      Panopto.viewer.hlsJsConfig = JSON.stringify(_.extend(r, { safari: !1 }));
     }
-    (V = $("#viewerContent")),
-      (I = $("#inlineMessageLetterbox")),
-      (k = $("#inlineMessage")),
-      (R = $("#loadingMessage")).show(),
-      PanoptoCore.Logging.Logger.addTransport(z),
-      (d = Panopto.Core.UI.Components.CopyrightNotice(
+    (I = $("#viewerContent")),
+      (k = $("#inlineMessageLetterbox")),
+      (R = $("#inlineMessage")),
+      (D = $("#loadingMessage")).show(),
+      PanoptoCore.Logging.Logger.addTransport(G),
+      (u = Panopto.Core.UI.Components.CopyrightNotice(
         $("#copyrightNoticeContainer"),
         Panopto.viewer.copyrightNoticeText,
-        0//Panopto.viewer.copyrightNoticeAutoDismissDuration
+        0
       ));
-    var r = Panopto.Core.StringHelpers.parseBoolean(W.advance);
-    E =
-      ((Panopto.features.autoPlayEnabled && "false" !== W.autoplay) || r) && !n;
-    var s = 0 === ue || me,
-      l = new PanoptoTS.Viewer.AutoPlayDetector({
-        muted: s,
+    var s = Panopto.Core.StringHelpers.parseBoolean(K.advance);
+    V =
+      ((Panopto.features.autoPlayEnabled && "false" !== K.autoplay) || s) && !o;
+    var l = 0 === pe || ve,
+      c = new PanoptoTS.Viewer.AutoPlayDetector({
+        muted: l,
         playsInline: !0,
-        autoPlayRequested: E,
+        autoPlayRequested: V,
       }).detect();
-    (M = function () {
-      l.then(function (i) {
-        (A = i),
-          (function (n, o, i) {
+    (H = function () {
+      c.then(function (a) {
+        (E = a),
+          (function (o, i, a) {
             new PanoptoTS.Viewer.Controls.DeliveryRefreshTimer(
-              n,
               o,
               i,
-              Y,
+              a,
+              !1,
+              X,
+              !0,
+              null,
+              null,
               t,
+              n,
               function (e) {
                 return new PanoptoTS.Viewer.Data.Delivery(e);
               },
               function (e) {
-                (P = e),
-                  i
-                    ? P.user.role <= Panopto.Data.AclRoleType.Viewer
+                (g = e),
+                  a
+                    ? g.user.role <= Panopto.Data.AclRoleType.Viewer
                       ? (window.location.href =
                           Panopto.viewer.unauthorizedEditorTransferUrl)
-                      : Se.routeDelivery(P)
-                    : Ie();
+                      : Ce.routeDelivery(g)
+                    : ke();
               },
-              Ve,
+              _e,
               function (t) {
                 e.updateDelivery(t);
               },
               function () {
                 window.location.reload();
               },
-              Ae
+              Ee
             ).start();
-          })(W.id || o, W.tid, n);
+          })(K.id || i, K.tid, o);
       });
     }),
       Panopto.viewer.data.playlist && Panopto.viewer.data.playlist.errorCode
         ? (function (t) {
             switch (t) {
-              case N.InvalidPlaylist:
-              case N.InvalidPlaylistUrl:
+              case z.InvalidPlaylist:
+              case z.InvalidPlaylistUrl:
                 e.toggleMessage(
                   Panopto.GlobalResources.ViewerPlus_InvalidPlaylist,
                   Panopto.GlobalResources.ViewerPlus_WatchSomethingElse,
-                  F.SessionListUrl
+                  N.SessionListUrl
                 );
                 break;
-              case N.InvalidPlaylistNoSessions:
+              case z.InvalidPlaylistNoSessions:
                 e.toggleMessage(
                   Panopto.GlobalResources
                     .ViewerPlus_PlaylistHasNoViewableSessions,
                   Panopto.GlobalResources.ViewerPlus_WatchSomethingElse,
-                  F.SessionListUrl
+                  N.SessionListUrl
                 );
                 break;
-              case N.UnknownError:
+              case z.UnknownError:
               default:
                 e.toggleMessage(
                   Panopto.GlobalResources.ViewerPlus_UnknownError,
@@ -2368,37 +2392,37 @@ var Silverlight = Silverlight;
                 );
             }
           })(Panopto.viewer.data.playlist.errorCode)
-        : M(),
-      n &&
+        : H(),
+      o &&
         ($(document).on("dragstart", function (e) {
           e.target.classList.contains("ui-draggable") || e.preventDefault();
         }),
-        V.on("dragenter", function () {
-          v.streamTab().showUploadOverlay({ secondaryOnly: !1 });
+        I.on("dragenter", function () {
+          y.streamTab().showUploadOverlay({ secondaryOnly: !1 });
         }));
   }),
     (e.isDeliveryError = function () {
-      return se;
+      return le;
     }),
     (e.positionAutoplayMessage = function () {
-      l && l.positionAutoplayMessage();
+      c && c.positionAutoplayMessage();
     }),
     (e.isLive = function () {
-      return u && u.isLive();
+      return p && p.isLive();
     }),
     (e.position = function (t) {
-      if (void 0 === t) return u ? u.position() : 0;
+      if (void 0 === t) return p ? p.position() : 0;
       e.isDVRDisabled() ||
-        (P.isBroadcast && u.setIsLive(t === 1 / 0, null),
-        u.setPosition(t, null),
-        P.isBroadcast &&
+        (g.isBroadcast && p.setIsLive(t === 1 / 0, null),
+        p.setPosition(t, null),
+        g.isBroadcast &&
           e.playState() === Panopto.Viewer.PlayState.Playing &&
-          u.setPlayStateWithLogging(Panopto.Viewer.PlayState.Playing, !0),
-        (te = t),
-        be(!0, t),
-        I.hide(),
-        Ce(!0),
-        (re = !1));
+          p.setPlayStateWithLogging(Panopto.Viewer.PlayState.Playing, !0),
+        (ne = t),
+        Te(!0, t),
+        k.hide(),
+        we(!0),
+        (se = !1));
     }),
     (e.getPosition = function () {
       return new PanoptoTS.Core.Logic.Time.UneditedFirstPrimaryRelative(
@@ -2407,146 +2431,146 @@ var Silverlight = Silverlight;
     }),
     (e.setPosition = e.position),
     (e.playState = function (t, n, o) {
-      if (void 0 === t) return ee;
-      Panopto.Core.Browser.isSafari && e.isDVRDisabled() && !j
-        ? l.togglePlayState(!0)
-        : (l.togglePlayState(t === a.Paused),
-          !Panopto.viewer.showCopyrightNotice || v
-            ? G.resolve()
-            : "pending" !== G.state() ||
-              d.isShowingNotice() ||
-              t !== a.Playing ||
-              u.onReady.then(function () {
-                O.getLeftPlayerElement().hide(),
-                  O.getRightPlayerElements().hide(),
-                  d.showNotice(function () {
-                    O.getLeftPlayerElement().show(),
-                      O.getRightPlayerElements().show(),
-                      A || ((t = a.Paused), l.togglePlayState(t === a.Paused)),
-                      G.resolve();
+      if (void 0 === t) return te;
+      Panopto.Core.Browser.isSafari && e.isDVRDisabled() && !Q
+        ? c.togglePlayState(!0)
+        : (c.togglePlayState(t === r.Paused),
+          !Panopto.viewer.showCopyrightNotice || y
+            ? j.resolve()
+            : "pending" !== j.state() ||
+              u.isShowingNotice() ||
+              t !== r.Playing ||
+              p.onReady.then(function () {
+                U.getLeftPlayerElement().hide(),
+                  U.getRightPlayerElements().hide(),
+                  u.showNotice(function () {
+                    U.getLeftPlayerElement().show(),
+                      U.getRightPlayerElements().show(),
+                      E || ((t = r.Paused), c.togglePlayState(t === r.Paused)),
+                      j.resolve();
                   });
               }),
-          G.done(function () {
-            t !== ee &&
-              (P.isBroadcast && t === a.Paused && !n && u.setIsLive(!1, null),
-              t === a.Playing &&
-                (re
+          j.done(function () {
+            t !== te &&
+              (g.isBroadcast && t === r.Paused && !n && p.setIsLive(!1, null),
+              t === r.Playing &&
+                (se
                   ? e.setPosition(0)
-                  : P.isBroadcast &&
-                    u.isLive() &&
+                  : g.isBroadcast &&
+                    p.isLive() &&
                     (Panopto.Core.Browser.isSafari ||
-                      (u.setIsLive(!1, null),
-                      e.setPlayState(a.Playing, void 0, void 0)),
-                    u.setIsLive(!0, function () {
+                      (p.setIsLive(!1, null),
+                      e.setPlayState(r.Playing, void 0, void 0)),
+                    p.setIsLive(!0, function () {
                       e.synchronize(!0);
                     }))),
-              u.setPlayStateWithLogging(t, !o),
-              (D && P.isBroadcast) ||
-                (t === a.Paused
-                  ? clearInterval(D)
-                  : (D = setInterval(function () {
-                      be(!1, null);
-                    }, F.TimedSyncRate))),
-              t === a.Playing && l.toggleAutoplayMessage(!1),
-              (ee = t),
-              m.clearSyncTimeout(),
-              _.each(Q, function (e) {
+              p.setPlayStateWithLogging(t, !o),
+              (x && g.isBroadcast) ||
+                (t === r.Paused
+                  ? clearInterval(x)
+                  : (x = setInterval(function () {
+                      Te(!1, null);
+                    }, N.TimedSyncRate))),
+              t === r.Playing && c.toggleAutoplayMessage(!1),
+              (te = t),
+              v.clearSyncTimeout(),
+              _.each(q, function (e) {
                 var t = e.getCurrentPlayer();
-                t && t.playState(ee);
+                t && t.playState(te);
               }),
-              q.syncPlayState(ee),
-              I.hide(),
-              Ce(!0),
-              v && v.synchronize(e.position(), ee === a.Playing));
+              W.syncPlayState(te),
+              k.hide(),
+              we(!0),
+              y && y.synchronize(e.position(), te === r.Playing));
           }));
     }),
     (e.setPlayState = e.playState),
     (e.reloadPrimaryContent = function (t, n) {
-      n && u.setStartPosition(n),
-        u.setPrimaryContent(P.primaryStreams, P.activePrimary, t, function () {
-          (j = !0), e.synchronize(!0);
+      n && p.setStartPosition(n),
+        p.setPrimaryContent(g.primaryStreams, g.activePrimary, t, function () {
+          (Q = !0), e.synchronize(!0);
         }),
-        n && u.setStartPosition(void 0);
+        n && p.setStartPosition(void 0);
     }),
     (e.setPrimarySegments = function (t, n, o, i) {
       if (
-        v &&
-        u &&
+        y &&
+        p &&
         n.length &&
-        ((y = _.filter(t, function (e) {
+        ((P = _.filter(t, function (e) {
           return !e.element.containsPrimary();
         })),
-        u.setSegments(t, n, o, i),
-        !Z && !isNaN(X))
+        p.setSegments(t, n, o, i),
+        !ee && !isNaN(Z))
       ) {
-        var a = Re(0, X);
-        e.setPosition(a), (Z = !0);
+        var a = De(0, Z);
+        e.setPosition(a), (ee = !0);
       }
     }),
     (e.activePrimary = function () {
-      return u.activePrimary();
+      return p.activePrimary();
     }),
     (e.activeSecondary = function () {
-      var e = Q.length > 0 && Q[0].getTabControl().selectedTab();
+      var e = q.length > 0 && q[0].getTabControl().selectedTab();
       return e && e.content();
     }),
     (e.selectSecondaryTab = function (e, t) {
-      Q.length > 0 && Q[0].getTabControl().selectTabById(e, t);
+      q.length > 0 && q[0].getTabControl().selectTabById(e, t);
     }),
     (e.toggleMessage = function (t, n, o, i) {
-      var r = $("#viewerMessage"),
-        s = r.find("#messageLink");
+      var a = $("#viewerMessage"),
+        s = a.find("#messageLink");
       t
-        ? ((C = e.position()),
-          ie &&
-            !b &&
-            ((b = e.playState()), e.setPlayState(a.Paused, void 0, void 0)),
+        ? ((w = e.position()),
+          ae &&
+            !T &&
+            ((T = e.playState()), e.setPlayState(r.Paused, void 0, void 0)),
           e.setFullscreenPlayer(void 0),
-          V.hide(),
-          R.hide(),
-          U && U.toggle(!1),
-          r.find("#messageText").html(t),
+          I.hide(),
+          D.hide(),
+          M && M.toggle(!1),
+          a.find("#messageText").html(t),
           n ? s.text(n).attr("href", o).show() : s.hide(),
-          r.find("#messageIcon").removeClass().addClass(i).attr("href", o),
-          r.show())
-        : r.is(":visible") &&
-          (r.hide(),
-          ie
-            ? (V.show(),
+          a.find("#messageIcon").removeClass().addClass(i).attr("href", o),
+          a.show())
+        : a.is(":visible") &&
+          (a.hide(),
+          ae
+            ? (I.show(),
               e.reloadPrimaryContent(!0, e.position()),
-              Q.forEach(function (e) {
+              q.forEach(function (e) {
                 var t = e.getStreamPlayer();
                 t && t.setContent(t.content(), !0, null);
               }),
-              e.setPlayState(b, void 0, void 0),
-              u.playState(b),
-              P.isBroadcast || e.setPosition(C),
-              (b = void 0))
-            : U && U.toggle(!0));
+              e.setPlayState(T, void 0, void 0),
+              p.playState(T),
+              g.isBroadcast || e.setPosition(w),
+              (T = void 0))
+            : M && M.toggle(!0));
     }),
     (e.toggleScreens = function (t) {
       e.viewMode &&
-        e.viewMode() !== i.LiveNotes &&
-        !I.is(":visible") &&
-        (t && w
-          ? (Ce(!0), e.setPlayState(w, void 0, void 0), (w = void 0))
+        e.viewMode() !== a.LiveNotes &&
+        !k.is(":visible") &&
+        (t && b
+          ? (we(!0), e.setPlayState(b, void 0, void 0), (b = void 0))
           : t ||
-            w ||
-            ((w = ee), e.setPlayState(a.Paused, void 0, void 0), Ce(!1))),
-        pe ||
+            b ||
+            ((b = te), e.setPlayState(r.Paused, void 0, void 0), we(!1))),
+        fe ||
           (Panopto.ModalPopup.defaultInstance.hide(function () {
             e.toggleScreens(!0);
           }),
-          (pe = !0));
+          (fe = !0));
     }),
     (e.playlistOverlayToggled = function (e) {
-      le || Ce(!e);
+      ce || we(!e);
     }),
     (e.fullscreenPlayer = function () {
       var e;
-      if (u && u.isFullscreen()) e = u;
+      if (p && p.isFullscreen()) e = p;
       else {
-        var t = _.find(Q, function (e) {
+        var t = _.find(q, function (e) {
           return e.getStreamPlayer() && e.getStreamPlayer().isFullscreen();
         });
         t && (e = t.getStreamPlayer());
@@ -2554,8 +2578,8 @@ var Silverlight = Silverlight;
       return e;
     }),
     (e.setFullscreenPlayer = function (e) {
-      u && u.setIsFullscreen(e === u);
-      for (var t = 0, n = Q; t < n.length; t++) {
+      p && p.setIsFullscreen(e === p);
+      for (var t = 0, n = q; t < n.length; t++) {
         var o = n[t].getStreamPlayer();
         o && o.setIsFullscreen(e === o);
       }
@@ -2564,76 +2588,76 @@ var Silverlight = Silverlight;
       return !!e.fullscreenPlayer();
     }),
     (e.ensureSecondaryIsMinimized = function () {
-      Q.forEach(function (e) {
+      q.forEach(function (e) {
         var t = e.getStreamPlayer();
         t && t.minimizeIfHidden();
       });
     }),
     (e.setCaptionStyles = function (e) {
-      p && p.setCaptionStyles(e), f && f.setCaptionStyles(e);
+      f && f.setCaptionStyles(e), h && h.setCaptionStyles(e);
     }),
-    (e.synchronize = be),
+    (e.synchronize = Te),
     (e.refreshPlayers = function () {
-      _.each(Q, function (t) {
-        t.reinitializeTabs(P, e), t.getTabControl().attachTabHandlers();
+      _.each(q, function (t) {
+        t.reinitializeTabs(g, e), t.getTabControl().attachTabHandlers();
       });
     }),
     (e.updateDelivery = function (t) {
-      (P = t),
-        V.is(":visible") && e.reloadPrimaryContent(!1, e.position()),
-        Q.forEach(function (t) {
-          t.updateTabs(P, e, u.streamLength());
+      (g = t),
+        I.is(":visible") && e.reloadPrimaryContent(!1, e.position()),
+        q.forEach(function (t) {
+          t.updateTabs(g, e, p.streamLength());
         }),
         e.toggleMessage(void 0),
-        P.broadcastEnded ? e.endBroadcast() : e.restartBroadcast();
+        g.broadcastEnded ? e.endBroadcast() : e.restartBroadcast();
     }),
     (e.endBroadcast = function () {
       var t;
-      ae &&
-        ((ae = !1),
-        (T = P.broadcastInterrupted
+      re &&
+        ((re = !1),
+        (A = g.broadcastInterrupted
           ? Panopto.GlobalResources.ViewerPlus_BroadcastInterrupted
           : Panopto.GlobalResources.ViewerPlus_BroadcastEnded_Notification),
-        (t = P.activePrimary.relativeEnd - F.BroadcastEndThreshold),
-        u.updateMaxPosition(t),
+        (t = g.activePrimary.relativeEnd - N.BroadcastEndThreshold),
+        p.updateMaxPosition(t),
         e.position() > t && e.setPosition(t),
-        S.setState({ viewerState: _.extend({}, S.state, { isEnded: !0 }) }));
+        C.setState({ viewerState: _.extend({}, C.state, { isEnded: !0 }) }));
     }),
     (e.restartBroadcast = function () {
-      ae ||
-        ((ae = !0),
-        (re = !1),
-        u.updateMaxPosition(null),
-        u.isLive() &&
-          (I.hide(),
+      re ||
+        ((re = !0),
+        (se = !1),
+        p.updateMaxPosition(null),
+        p.isLive() &&
+          (k.hide(),
           Panopto.Core.Browser.isSafari ||
-            (u.setIsLive(!1, null), e.setPlayState(a.Playing, void 0, void 0)),
-          u.setIsLive(!0, function () {
+            (p.setIsLive(!1, null), e.setPlayState(r.Playing, void 0, void 0)),
+          p.setIsLive(!0, function () {
             e.synchronize(!0);
           })),
-        S.setState({
-          viewerState: _.extend({}, S.state.viewerState, { isEnded: !0 }),
+        C.setState({
+          viewerState: _.extend({}, C.state.viewerState, { isEnded: !0 }),
         }));
     }),
     (e.isActiveBroadcast = function () {
-      return P.isBroadcast && ae;
+      return g.isBroadcast && re;
     }),
-    (e.logDesync = function (e, t, n, i) {
-      i
-        ? (o.sendDesyncEvent({
+    (e.logDesync = function (e, t, n, o) {
+      o
+        ? (i.sendDesyncEvent({
             diff: e,
-            deliveryId: P.id,
-            invocationId: P.invocationId,
+            deliveryId: g.id,
+            invocationId: g.invocationId,
             syncLogic: t,
             actionMessage: n,
           }),
-          B.info("(" + t + ") " + n + " for delta " + e))
-        : B.verbose("(" + t + ") " + n + " for delta " + e);
+          F.info("(" + t + ") " + n + " for delta " + e))
+        : F.verbose("(" + t + ") " + n + " for delta " + e);
     }),
     (e.submitClientLog = function (e, t) {
       var n = {
-        DeliveryParams: P.serverModel,
-        Entries: z.retrieveLogs().map(function (e) {
+        DeliveryParams: g.serverModel,
+        Entries: G.retrieveLogs().map(function (e) {
           return { Type: null, Position: null, Timestamp: null, Detail: e };
         }),
       };
@@ -2644,146 +2668,146 @@ var Silverlight = Silverlight;
       );
     }),
     (e.togglePlaying = function (t) {
-      if (!we())
+      if (!be())
         switch (
-          (o.sendEvent({
-            action: ee === a.Playing ? o.Actions.Pause : o.Actions.Play,
-            label: t || o.Labels.Fullscreen,
+          (i.sendEvent({
+            action: te === r.Playing ? i.Actions.Pause : i.Actions.Play,
+            label: t || i.Labels.Fullscreen,
           }),
-          ee)
+          te)
         ) {
-          case a.Playing:
-            e.setPlayState(a.Paused, void 0, void 0);
+          case r.Playing:
+            e.setPlayState(r.Paused, void 0, void 0);
             break;
           default:
-            e.setPlayState(a.Playing, void 0, void 0);
+            e.setPlayState(r.Playing, void 0, void 0);
         }
     }),
     (e.rewind = function (t, n) {
       e.userSeekEnabled() &&
-        (o.sendEvent({
-          action: o.Actions.Rewind,
-          label: t || o.Labels.Fullscreen,
+        (i.sendEvent({
+          action: i.Actions.Rewind,
+          label: t || i.Labels.Fullscreen,
         }),
-        (n = n || F.QuickRewindSeconds),
+        (n = n || N.QuickRewindSeconds),
         (n = (function (e, t) {
           var n = t;
-          if (y)
+          if (P)
             for (
-              var o = _.findLastIndex(y, function (t) {
+              var o = _.findLastIndex(P, function (t) {
                   return t.end <= e;
                 }),
-                i = y[o];
+                i = P[o];
               i && i.end > e - n;
 
             )
-              (n += i.end - i.start), (i = y[--o]);
+              (n += i.end - i.start), (i = P[--o]);
           return n;
         })(e.position(), n)),
         e.setPosition(Math.max(0, e.position() - n)));
     }),
     (e.skipToStart = function (t) {
       e.userSeekEnabled() &&
-        (o.sendEvent({
-          action: o.Actions.SkipToStart,
-          label: t || o.Labels.Fullscreen,
+        (i.sendEvent({
+          action: i.Actions.SkipToStart,
+          label: t || i.Labels.Fullscreen,
         }),
         e.setPosition(0));
     }),
     (e.forward = function (t, n) {
       e.userSeekEnabled() &&
-        (o.sendEvent({
-          action: o.Actions.Forward,
-          label: t || o.Labels.Fullscreen,
+        (i.sendEvent({
+          action: i.Actions.Forward,
+          label: t || i.Labels.Fullscreen,
         }),
-        (n = n || F.QuickForwardSeconds),
-        (P.isBroadcast && u.isLive()) ||
-          ((n = Re(e.position(), n)),
-          e.setPosition(Math.min(x, e.position() + n))));
+        (n = n || N.QuickForwardSeconds),
+        (g.isBroadcast && p.isLive()) ||
+          ((n = De(e.position(), n)),
+          e.setPosition(Math.min(L, e.position() + n))));
     }),
     (e.skipToEnd = function (t) {
       e.userSeekEnabled() &&
-        (o.sendEvent({
-          action: o.Actions.SkipToEnd,
-          label: t || o.Labels.Fullscreen,
+        (i.sendEvent({
+          action: i.Actions.SkipToEnd,
+          label: t || i.Labels.Fullscreen,
         }),
-        e.setPosition(x));
+        e.setPosition(L));
     }),
     (e.volumeUp = function (e, t) {
-      (e = e || o.Labels.Fullscreen),
-        (t = t || F.VolumeIncrement),
-        l.updateVolume(u.volume() + t, !0, e);
+      (e = e || i.Labels.Fullscreen),
+        (t = t || N.VolumeIncrement),
+        c.updateVolume(p.volume() + t, !0, e);
     }),
     (e.volumeDown = function (e, t) {
-      (e = e || o.Labels.Fullscreen),
-        (t = t || F.VolumeIncrement),
-        l.updateVolume(u.volume() - t, !0, e);
+      (e = e || i.Labels.Fullscreen),
+        (t = t || N.VolumeIncrement),
+        c.updateVolume(p.volume() - t, !0, e);
     }),
     (e.toggleMuted = function (e) {
-      o.sendEvent({
-        action: u.isMuted() ? o.Actions.Unmute : o.Actions.Mute,
-        label: e || o.Labels.Fullscreen,
+      i.sendEvent({
+        action: p.isMuted() ? i.Actions.Unmute : i.Actions.Mute,
+        label: e || i.Labels.Fullscreen,
       }),
-        l.toggleMuted();
+        c.toggleMuted();
     }),
     (e.hotkey = function (t) {
       switch (t) {
-        case F.PlayKeyCode:
-          e.togglePlaying(o.Labels.Hotkey);
+        case N.PlayKeyCode:
+          e.togglePlaying(i.Labels.Hotkey);
           break;
-        case F.RewindKeyCode:
-          e.rewind(o.Labels.Hotkey, F.PositionIncrement);
+        case N.RewindKeyCode:
+          e.rewind(i.Labels.Hotkey, N.PositionIncrement);
           break;
-        case F.ForwardKeyCode:
-          e.forward(o.Labels.Hotkey, F.PositionIncrement);
+        case N.ForwardKeyCode:
+          e.forward(i.Labels.Hotkey, N.PositionIncrement);
           break;
-        case F.VolumeUpKeyCode:
-          l.showVolumeControl(), e.volumeUp(o.Labels.Hotkey);
+        case N.VolumeUpKeyCode:
+          c.showVolumeControl(), e.volumeUp(i.Labels.Hotkey);
           break;
-        case F.VolumeDownKeyCode:
-          l.showVolumeControl(), e.volumeDown(o.Labels.Hotkey);
+        case N.VolumeDownKeyCode:
+          c.showVolumeControl(), e.volumeDown(i.Labels.Hotkey);
           break;
-        case F.MuteKeyCode:
-          e.toggleMuted(o.Labels.Hotkey);
+        case N.MuteKeyCode:
+          e.toggleMuted(i.Labels.Hotkey);
       }
     }),
     (e.getQuestionList = function (e) {
-      return v ? v.getQuestionList(e) : void 0;
+      return y ? y.getQuestionList(e) : void 0;
     }),
     (e.updateQuestionList = function (e) {
-      return v ? v.updateQuestionList(e) : void 0;
+      return y ? y.updateQuestionList(e) : void 0;
     }),
     (e.getSinglePageAppConfig = function () {
       return { quizFillInTheBlankEnabled: !0 };
     }),
     (e.getSessionLength = function () {
-      return v
-        ? v.activeState().duration() /
+      return y
+        ? y.activeState().duration() /
             Panopto.Core.Constants.TimelineChunkToMillisMultiplier
         : void 0;
     }),
     (e.getEvent = function (e) {
-      return v ? v.getEvent(e) : void 0;
+      return y ? y.getEvent(e) : void 0;
     }),
     (e.validateEventTime = function (e) {
-      return v ? v.validateEventTime(e) : void 0;
+      return y ? y.validateEventTime(e) : void 0;
     }),
     (e.updateEvent = function (e) {
-      return v ? v.updateEvent(e) : void 0;
+      return y ? y.updateEvent(e) : void 0;
     }),
     (e.isDVRDisabled = function () {
       var e =
-        u.optimizationProvider() === PanoptoTS.Viewer.Constants.Hive &&
+        p.optimizationProvider() === PanoptoTS.Viewer.Constants.Hive &&
         (Panopto.Core.Browser.isIE11 ||
           Panopto.Core.Browser.isEdge ||
           Panopto.Core.Browser.isSafari);
-      return P.isBroadcast && e;
+      return g.isBroadcast && e;
     }),
     (e.userSeekEnabled = function () {
-      var t = Boolean(u && e.isDVRDisabled());
+      var t = Boolean(p && e.isDVRDisabled());
       return !(
-        ((Panopto.viewer.disableSeekAndVsp && !P.isBroadcast) || t) &&
-        !v
+        ((Panopto.viewer.disableSeekAndVsp && !g.isBroadcast) || t) &&
+        !y
       );
     }),
     (e.reportPercentCompleted = function (t) {
@@ -2795,14 +2819,14 @@ var Silverlight = Silverlight;
     (e.updateDisableSeekAndVsp = function (t) {
       Panopto.viewer.disableSeekAndVsp !== t &&
         ((Panopto.viewer.disableSeekAndVsp = t),
-        l && l.onUserSeekEnabledChanging(e.userSeekEnabled()));
+        c && c.onUserSeekEnabledChanging(e.userSeekEnabled()));
     }),
     (e.setSecondaryCount = function (t) {
-      if (t !== Q.length) {
-        for (; Q.length < t; ) {
+      if (t !== q.length) {
+        for (; q.length < t; ) {
           var n,
-            o = $.parseHTML(he);
-          de.getRightPlayerContainer().append(o),
+            o = $.parseHTML(me);
+          ue.getRightPlayerContainer().append(o),
             (n = Panopto.viewer.allowMultipleSecondaryDisplay
               ? new PanoptoTS.Viewer.Controls.OverlayTabControlElements($(o))
               : new PanoptoTS.Viewer.Viewer.TabElements(
@@ -2813,66 +2837,66 @@ var Silverlight = Silverlight;
                 ));
           var i = new PanoptoTS.Viewer.Controls.SecondaryContentContainer(
             n,
-            P,
+            g,
             e,
-            Q.length
+            q.length
           );
-          Q.push(i);
+          q.push(i);
           var a = i.getStreamPlayer();
           a &&
-            ((f = a.getCaptionControl()),
+            ((h = a.getCaptionControl()),
             a.getFullscreenStateControl() &&
-              q.add(a.getFullscreenStateControl()));
+              W.add(a.getFullscreenStateControl()));
         }
-        for (var r = O.getRightPlayerElements(); Q.length > t; ) {
-          $(r[Q.length - 1]).remove(),
-            (i = Q[Q.length - 1]).remove(),
-            (Q.length = Q.length - 1);
+        for (var r = U.getRightPlayerElements(); q.length > t; ) {
+          $(r[q.length - 1]).remove(),
+            (i = q[q.length - 1]).remove(),
+            (q.length = q.length - 1);
         }
-        if (t !== Q.length) {
-          var s = Q.length;
-          B.error(
+        if (t !== q.length) {
+          var s = q.length;
+          F.error(
             "Expected to resolve to " + t + " secondary containers. Found " + s
           );
         }
-        m && m.clearSyncTimeout(),
-          Q.length > 0 &&
-            (m = PanoptoTS.Viewer.Logic.PlayerSynchronizationLogicFactory.create(
+        v && v.clearSyncTimeout(),
+          q.length > 0 &&
+            (v = PanoptoTS.Viewer.Logic.PlayerSynchronizationLogicFactory.create(
               e,
-              l,
-              u,
-              Q
+              c,
+              p,
+              q
             )),
           e.resize &&
             (e.isSecondarySwapAllowed() ||
-              O.getPrimaryPlayerIndex() === O.PrimaryDefaultIndex ||
-              e.swapLeftToRight(O.PrimaryDefaultIndex),
+              U.getPrimaryPlayerIndex() === U.PrimaryDefaultIndex ||
+              e.swapLeftToRight(U.PrimaryDefaultIndex),
             e.resize(),
             e.synchronize());
       }
     }),
     (e.hasPendingSecondaryUploads = function () {
-      return !!v && v.streamTab().hasPendingSecondaryUploads();
+      return !!y && y.streamTab().hasPendingSecondaryUploads();
     }),
     (e.toggleSecondaryPlaceholder = function (e) {
-      v && v.overlayController.toggleSecondaryPlaceholder(e);
+      y && y.overlayController.toggleSecondaryPlaceholder(e);
     }),
     (e.reinitializeDelivery = function () {
-      v.overlayController.closeOverlays(), M();
+      y.overlayController.closeOverlays(), H();
     }),
     (e.forceLeftPlayerHeight = !1),
     (e.pageStructureElements = function () {
-      return de;
+      return ue;
     }),
-    (e.playerSelection = fe);
-  var De = [];
+    (e.playerSelection = he);
+  var xe = [];
   return (
     (e.addSessionNameUpdateListener = function (e) {
-      De.push(e);
+      xe.push(e);
     }),
     (e.updateSessionName = function (e, t) {
       var n = t.fromHeader;
-      De.forEach(function (t) {
+      xe.forEach(function (t) {
         return t(e, { fromHeader: n });
       });
     }),
@@ -3252,6 +3276,430 @@ var Silverlight = Silverlight;
         t.ViewerDialog = n;
       })(t.QuotaPlaybackModalDialogs || (t.QuotaPlaybackModalDialogs = {}));
     })(e.Controls || (e.Controls = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  (Panopto.Viewer.Players = Panopto.Viewer.Players || {}),
+  (function (e) {
+    !(function (t) {
+      var n, o;
+      (n = t.Data || (t.Data = {})),
+        (o = (function () {
+          function n(t) {
+            var n = Panopto.Viewer.Data,
+              o = e.Viewer.Constants,
+              i = t.Delivery.SessionName,
+              a = Panopto.Core.TimeHelpers.formatWin32EpochTimeToDate(
+                t.Delivery.SessionStartTime
+              ),
+              r = t.Delivery.IsActiveBroadcast,
+              s =
+                t.Delivery.IsBroadcast &&
+                t.Delivery.IsViewerEncodeComplete &&
+                new Date().getTime() - a.getTime() <=
+                  o.RecentBroadcastThreshold,
+              l = this.parseStreams(t.Delivery.Streams, i, r),
+              c = l.primaryStreams,
+              d = l.secondaryStreams,
+              u = l.activePrimary,
+              p = l.screenCaptureStream,
+              f = this.parsePlayerInfo(c, u, r),
+              h = f.multiBitrateEnabled,
+              m = f.playSpeedEnabled,
+              v = f.flowPlayerEnabled,
+              y = f.requiresSilverlight,
+              P = this.parseEvents(
+                t.Delivery.Timestamps,
+                t.Delivery.EventTargets,
+                t.Delivery.PublicNotesStreams,
+                t.Delivery.Duration,
+                p
+              ),
+              g = P.slides,
+              S = P.documents,
+              C = P.thumbnails,
+              w = P.contents,
+              b = P.channels;
+            (this.title = i),
+              (this.id = t.Delivery.PublicID),
+              (this.webcastVersionId = t.WebcastVersionId),
+              (this.date = a),
+              (this.duration = t.Delivery.Duration),
+              (this.description = t.Delivery.SessionAbstract),
+              (this.ownerId = t.Delivery.OwnerId),
+              (this.ownerFullName = t.Delivery.OwnerDisplayName),
+              (this.ownerBio = t.Delivery.OwnerBio),
+              (this.ownerIsOverQuota = t.Delivery.OwnerIsOverQuota),
+              (this.invocationId = t.InvocationId),
+              (this.embedUrl = t.EmbedUrl),
+              (this.downloadUrl = t.DownloadUrl),
+              (this.podcastCompleted = t.PodcastCompleted),
+              (this.broadcastRefreshInterval =
+                1e3 * t.BroadcastRefreshInterval),
+              (this.webcastApiRefreshInterval =
+                1e3 * t.WebcastPingIntervalInSeconds),
+              (this.broadcastSegmentBackoff = t.BroadcastSegmentBackoff),
+              (this.allowPublicNotes = t.AllowPublicNotes),
+              (this.hasAnyLinks = t.Delivery.HasAnyLinks),
+              (this.hasQuiz = t.Delivery.HasQuiz),
+              (this.firstQuizOffset = t.Delivery.FirstQuizOffset),
+              (this.hasCaptions = t.Delivery.HasCaptions),
+              (this.availableLanguages = t.Delivery.AvailableLanguages),
+              (this.isBroadcast = r),
+              (this.isViewable = (r && u) || t.Delivery.IsViewerEncodeComplete),
+              (this.isReadyForEditing = t.Delivery.IsReadyForEditing),
+              (this.RehydrationAvailable = t.Delivery.RehydrationAvailable),
+              (this.isPurgedEncode = t.Delivery.IsPurgedEncode),
+              (this.isPurgedLegacyEncode = t.Delivery.IsPurgedLegacyEncode),
+              (this.requiresAdvancedEditor = t.Delivery.RequiresAdvancedEditor),
+              (this.broadcastEnded = t.Delivery.BroadcastEnded),
+              (this.broadcastInterrupted = t.Delivery.BroadcastInterrupted),
+              (this.isRecentBroadcast = s),
+              (this.isPrimaryAudioOnly = t.Delivery.IsPrimaryAudioOnly),
+              (this.requiresSilverlight = y),
+              (this.flowPlayerEnabled = v),
+              (this.multiBitrateEnabled = h),
+              (this.playSpeedEnabled = m),
+              (this.discussionEnabled = t.Delivery.DiscussionEnabled),
+              (this.discussionCacheSeconds = t.DiscussionCacheSeconds),
+              (this.lastViewingPosition = t.LastViewingPosition),
+              (this.completionPercentage = t.CompletionPercentage),
+              (this.activePrimary = u),
+              (this.primaryStreams = c),
+              (this.secondaryStreams = d),
+              (this.slideDecks = g.length ? [n.SlideDeck(g)] : []),
+              (this.documents = S),
+              (this.thumbnails = C),
+              (this.captions = []),
+              (this.contents = w),
+              (this.channels = b),
+              (this.tags = t.Delivery.Tags),
+              (this.user = {
+                email: t.UserEmail,
+                name: t.UserName,
+                key: (t.UserKey || "").toLowerCase(),
+                rating: t.UserRating,
+                role: t.SessionRole,
+                canCreateQuestionLists: t.UserCanCreateQuestionLists,
+                permissions: t.Delivery.Permissions || [],
+              }),
+              (this.folder = {
+                name: t.Delivery.SessionGroupLongName,
+                description: t.Delivery.SessionGroupAbstract,
+                id: t.Delivery.SessionGroupPublicID,
+              }),
+              (this.nextDelivery = void 0),
+              t.Delivery.NextDeliveryUrl &&
+                (this.nextDelivery = {
+                  id: t.Delivery.NextDeliveryId,
+                  url: t.Delivery.NextDeliveryUrl,
+                  title: t.Delivery.NextDeliveryTitle,
+                  description: t.Delivery.NextDeliveryDescription,
+                  duration: Panopto.Core.TimeHelpers.formatDuration(
+                    t.Delivery.NextDeliveryDuration,
+                    Panopto.GlobalResources.TimeSeparator
+                  ),
+                  thumbUrl: t.Delivery.NextDeliveryThumbUrl,
+                  isLive: t.Delivery.NextDeliveryIsLive,
+                  folderName: void 0,
+                }),
+              (this.serverModel = t);
+          }
+          return (
+            (n.prototype.parseStreams = function (e, n, o) {
+              var i = _.map(
+                  _.filter(e, function (e) {
+                    return "Archival" === e.StreamTypeName;
+                  }),
+                  function (e) {
+                    return Panopto.Viewer.Data.Stream(e, o, n);
+                  }
+                ),
+                a = (i = _.sortBy(i, "relativeStart")).length
+                  ? o
+                    ? _.find(i, function (e) {
+                        return !e.relativeEnd;
+                      }) ||
+                      _.max(i, function (e) {
+                        return e.relativeEnd;
+                      })
+                    : i[0]
+                  : void 0,
+                r = o ? i : a ? [a] : [],
+                s = _.map(
+                  _.filter(e, function (e) {
+                    return "Archival" !== e.StreamTypeName;
+                  }),
+                  function (e) {
+                    return Panopto.Viewer.Data.Stream(e, o, n);
+                  }
+                );
+              return {
+                primaryStreams: r,
+                secondaryStreams: s,
+                activePrimary: a,
+                screenCaptureStream: _.find(s, function (e) {
+                  return e.tabClass === t.Constants.ScreenCaptureClass;
+                }),
+              };
+            }),
+            (n.prototype.parsePlayerInfo = function (e, n, o) {
+              var i = !!n && _.contains(["ism", "wmv"], n.fileType),
+                a =
+                  !new RegExp(Panopto.features.hlsFlashFallbackRegex).test(
+                    navigator.userAgent
+                  ) &&
+                  !Panopto.Core.Browser.isWin7IE11 &&
+                  _.any(flowplayer.engines, function (e) {
+                    return (
+                      "hlsjs" === e.engineName || "hlsjs-lite" === e.engineName
+                    );
+                  }),
+                r = Panopto.Core.Browser.supportsVideo(t.Constants.MP4MimeType),
+                s =
+                  ((!e.length || "hls" === n.fileType) && a) ||
+                  ((!e.length || "mp4" === n.fileType) && r),
+                l = Panopto.viewer.flowplayerEnabled && !i && s,
+                c = !1;
+              n &&
+                (c =
+                  "ism" === n.fileType ||
+                  ("hls" === n.fileType &&
+                    (l || Panopto.Core.Browser.flashEnabled())));
+              var d = !1;
+              return (
+                !o &&
+                  n &&
+                  (d =
+                    l ||
+                    ("mp4" === n.fileType && r) ||
+                    ("hls" === n.fileType && n.httpUrl && r) ||
+                    ("wmv" === n.fileType && !Panopto.Core.Browser.isWebkit)),
+                {
+                  multiBitrateEnabled: c,
+                  playSpeedEnabled: d,
+                  flowPlayerEnabled: l,
+                  requiresSilverlight: i,
+                }
+              );
+            }),
+            (n.prototype.parseEvents = function (t, n, o, i, a) {
+              var r = Panopto.Viewer.Data,
+                s = _.filter(t, function (e) {
+                  return (
+                    (e.Time || 0 === e.Time) &&
+                    e.Time <= i &&
+                    e.ObjectIdentifier &&
+                    e.ObjectSequenceNumber
+                  );
+                }),
+                l = _.filter(s, function (e) {
+                  return "PowerPoint" === e.EventTargetType;
+                }),
+                c = _.filter(s, function (e) {
+                  return e.Url;
+                }),
+                d = [];
+              _.each(c, function (t) {
+                return d.push(new e.Viewer.Data.Document(t));
+              }),
+                _.each(n, function (t) {
+                  return d.push(new e.Viewer.Data.Document(t));
+                });
+              var u = _.filter(s, function (e) {
+                return (
+                  !e.Url &&
+                  _.contains(
+                    ["ObjectVideo", "Primary", "SmartOcrToc"],
+                    e.EventTargetType
+                  )
+                );
+              }).concat(l);
+              u.sort(function (e, t) {
+                return e.Time - t.Time;
+              });
+              var p,
+                f = _.map(u, function (t) {
+                  return new e.Viewer.Data.Thumbnail(t, a);
+                }),
+                h = _.chain(u.concat(c))
+                  .unique()
+                  .map(function (t) {
+                    return new e.Viewer.Data.Event(t);
+                  })
+                  .filter(function (e) {
+                    return !!jQuery.trim(e.text);
+                  })
+                  .value();
+              return (
+                o &&
+                  (p = _.map(o, function (e) {
+                    return r.Channel(e, e, !0);
+                  })),
+                {
+                  slides: l,
+                  documents: d,
+                  thumbnails: f,
+                  contents: h,
+                  channels: p,
+                }
+              );
+            }),
+            n
+          );
+        })()),
+        (n.Delivery = o);
+    })(e.Viewer || (e.Viewer = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
+  (Panopto.Viewer.Data.Stream = function (e, t, n) {
+    var o,
+      i = [],
+      a = [],
+      r =
+        e.Name ||
+        ("SCREEN" === e.Tag
+          ? Panopto.GlobalResources.ViewerPlus_ScreenCaptureTitle
+          : Panopto.GlobalResources.ViewerPlus_ObjectVideoTitle),
+      s =
+        "SCREEN" === e.Tag
+          ? PanoptoTS.Viewer.Constants.ScreenCaptureClass
+          : PanoptoTS.Viewer.Constants.ObjectVideoTabClass,
+      l = function (e, n) {
+        var o = e - PanoptoTS.Viewer.Constants.SecondaryStreamOffset;
+        return t || (n && o <= n + PanoptoTS.Viewer.Constants.MinSegmentGap)
+          ? e
+          : Math.max(0, o);
+      };
+    switch (
+      (e.RelativeSegments && e.RelativeSegments.length
+        ? _.each(e.RelativeSegments, function (e, t) {
+            var n = new PanoptoTS.Viewer.Data.SecondarySegment(e),
+              o = a[t - 1];
+            (n.timelineStart = l(n.relativeStart, o ? o.relativeEnd : 0)),
+              a.push(n),
+              i.push(n.timelineStart, n.relativeEnd);
+          })
+        : (i.push(l(e.RelativeStart, void 0)),
+          e.RelativeEnd && i.push(e.RelativeEnd)),
+      ((o = PanoptoTS.Viewer.Data.ContentHelpers.createBaseContent(
+        r,
+        e.PublicID,
+        s,
+        i,
+        e.AbsoluteStart,
+        "",
+        "",
+        !1,
+        !1,
+        !1,
+        t,
+        !1
+      )).url = e.StreamUrl),
+      (o.httpUrl = e.StreamHttpUrl),
+      (o.fileType = e.ViewerMediaFileTypeName),
+      (o.relativeStart = e.RelativeStart),
+      (o.relativeEnd = e.RelativeEnd),
+      (o.length = e.RelativeEnd ? e.RelativeEnd - e.RelativeStart : 0),
+      (o.segments = a),
+      (o.interrupted = e.Interrupted),
+      (o.editFileType = e.EditMediaFileTypeName),
+      (o.deliveryTitle = n),
+      (o.broadcastSegmentDuration = e.BroadcastSegmentDuration),
+      (o.broadcastSegmentBackoff =
+        e.BroadcastSegmentBackoff || Panopto.viewer.broadcastSegmentBackoff),
+      (o.vrType = e.VRType),
+      Panopto.viewer.pureHlsJsPlayback &&
+        o.vrType !== PanoptoViewer.MediaVRType.None &&
+        (Panopto.Core.Browser.isSafari || Panopto.Core.Browser.isIE) &&
+        (window.location.href = window.location.href + "&pureHlsJs=false"),
+      e.Tag)
+    ) {
+      case "AUDIO":
+        (o.type =
+          Panopto.Core.ServiceInterface.Rest.Objects.StreamContentType.Audio),
+          (o.isAudioOnly = !0);
+        break;
+      case "SCREEN":
+        (o.type =
+          Panopto.Core.ServiceInterface.Rest.Objects.StreamContentType.Screen),
+          (o.isAudioOnly = !1);
+        break;
+      default:
+        (o.type =
+          Panopto.Core.ServiceInterface.Rest.Objects.StreamContentType.Camera),
+          (o.isAudioOnly = !1);
+    }
+    return (o.optimizationToken = e.OptimizationToken), o;
+  }),
+  (function (e) {
+    !(function (e) {
+      !(function (e) {
+        var t = function (e) {
+          (this.relativeStart = e.RelativeStart),
+            (this.relativeEnd = e.End
+              ? e.RelativeStart + (e.End - e.Start)
+              : 1 / 0),
+            (this.streamOffset = e.Start);
+        };
+        e.SecondarySegment = t;
+      })(e.Data || (e.Data = {}));
+    })(e.Viewer || (e.Viewer = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  (function (e) {
+    !(function (e) {
+      !(function (e) {
+        var t = (function () {
+          function e() {}
+          return (
+            (e.prototype.getStreamFriendlyType = function () {
+              var e;
+              switch (this.type) {
+                case Panopto.Core.ServiceInterface.Rest.Objects
+                  .StreamContentType.Audio:
+                  e = Panopto.GlobalResources.ViewerPlus_AudioTitle;
+                  break;
+                case Panopto.Core.ServiceInterface.Rest.Objects
+                  .StreamContentType.Screen:
+                case Panopto.Core.ServiceInterface.Rest.Objects
+                  .StreamContentType.Slide:
+                  e = Panopto.GlobalResources.ViewerPlus_ScreenCaptureTitle;
+                  break;
+                case Panopto.Core.ServiceInterface.Rest.Objects
+                  .StreamContentType.Camera:
+                default:
+                  e = Panopto.GlobalResources.ViewerPlus_ObjectVideoTitle;
+              }
+              return e;
+            }),
+            (e.prototype.getStreamName = function () {
+              return this.name || this.getStreamFriendlyType();
+            }),
+            (e.convertFromApiModel = function (t) {
+              var n = new e();
+              return (
+                (n.id = t.id),
+                (n.url = t.url),
+                (n.httpUrl = t.httpUrl),
+                (n.absoluteStart = t.absoluteStart),
+                (n.duration = t.duration),
+                (n.thumbnailUrlBase = t.thumbnailUrlBase),
+                (n.thumbnailInterval = t.thumbnailInterval),
+                (n.type = t.type),
+                (n.vrType = t.vrType),
+                (n.name = t.name),
+                (n.iconCode = t.iconCode),
+                (n.absoluteEnd = t.absoluteEnd()),
+                (n.streamType = t.isPrimary ? 1 : 2),
+                (n.normalizeVolume = t.normalizeVolume),
+                n
+              );
+            }),
+            e
+          );
+        })();
+        e.Stream = t;
+      })(e.Data || (e.Data = {}));
+    })(e.Viewer || (e.Viewer = {}));
   })(PanoptoTS || (PanoptoTS = {}));
 var __extends =
   (this && this.__extends) ||
@@ -3442,66 +3890,124 @@ __extends =
     !(function (e) {
       !(function (t) {
         var n = (function () {
-          function t(t, n, o, i, a, r, s, l, c, d, u) {
-            var p = this;
-            (this.deliveryId = t),
-              (this.tokenId = n),
-              (this.isEditing = o),
-              (this.isLiveNotes = i),
-              (this.deliveryService = a),
-              (this.deliveryTransform = r),
-              (this.onDeliverySet = s),
-              (this.onDeliveryViewable = l),
-              (this.onBroadcastUpdated = c),
-              (this.onBroadcastReopened = d),
-              (this.onFatalError = u),
+          function t(n, o, i, a, r, s, l, c, d, u, p, f, h, m, v, y) {
+            var P = this;
+            (this.deliveryId = n),
+              (this.tokenId = o),
+              (this.isEditing = i),
+              (this.isEmbed = a),
+              (this.isLiveNotes = r),
+              (this.refreshAuthCookie = s),
+              (this.overrideFQDN = l),
+              (this.uniqueViewerId = c),
+              (this.deliveryService = d),
+              (this.webcastVersionService = u),
+              (this.deliveryTransform = p),
+              (this.onDeliverySet = f),
+              (this.onDeliveryViewable = h),
+              (this.onBroadcastUpdated = m),
+              (this.onBroadcastReopened = v),
+              (this.onFatalError = y),
               (this.retryCount = 0),
               (this.refreshDelivery = function () {
-                p.deliveryService.getDelivery(
-                  p.deliveryId,
-                  p.tokenId,
-                  p.delivery ? p.delivery.invocationId : void 0,
+                var e;
+                P.deliveryService.getDelivery(
+                  P.deliveryId,
+                  P.tokenId,
+                  null !== (e = P.invocationId) && void 0 !== e
+                    ? e
+                    : P.delivery
+                    ? P.delivery.invocationId
+                    : void 0,
                   {
-                    refreshAuthCookie: !0,
-                    isActiveBroadcast: p.isActiveBroadcast,
-                    isEditing: p.isEditing,
-                    isLiveNotes: p.isLiveNotes,
+                    refreshAuthCookie: P.refreshAuthCookie,
+                    isActiveBroadcast: P.isActiveBroadcast,
+                    isEditing: P.isEditing,
+                    isEmbed: P.isEmbed,
+                    isLiveNotes: P.isLiveNotes,
+                    overrideFQDN: P.overrideFQDN,
+                    uniqueViewerIdParam: P.uniqueViewerId,
                   },
-                  p.handleDeliverySuccess,
-                  p.handleDeliveryError
+                  P.handleDeliverySuccess,
+                  P.handleDeliveryError
                 );
               }),
-              (this.handleDeliverySuccess = function (t) {
-                p.retryCount = 0;
-                var n = p.delivery;
-                (p.delivery = p.deliveryTransform(t)),
-                  n
-                    ? p.delivery.isBroadcast && !n.isBroadcast
-                      ? p.onBroadcastReopened(p.delivery)
-                      : p.delivery.isViewable && !n.isViewable
-                      ? p.onDeliveryViewable(p.delivery)
-                      : p.delivery.isViewable &&
-                        p.isActiveBroadcast &&
-                        p.onBroadcastUpdated(p.delivery)
-                    : ((p.isActiveBroadcast = p.delivery.isBroadcast),
-                      p.onDeliverySet(p.delivery)),
-                  (p.refreshInterval = p.isActiveBroadcast
-                    ? p.delivery.broadcastRefreshInterval
-                    : p.delivery.isViewable
-                    ? p.delivery.isRecentBroadcast
-                      ? e.Constants.ReopenedBroadcastInterval
-                      : void 0
-                    : e.Constants.DeliveryRefreshInterval),
-                  p.refreshInterval && p.setRefreshTimeout();
+              (this.refreshWebcastVersion = function () {
+                P.webcastVersionService.getWebcastVersion(
+                  P.deliveryId,
+                  P.handleWebcastVersionSuccess,
+                  P.handleWebcastVersionError
+                );
+              }),
+              (this.handleDeliverySuccess = function (n) {
+                P.retryCount = 0;
+                var o = P.delivery;
+                (P.delivery = P.deliveryTransform(n)),
+                  o
+                    ? (P.delivery.isBroadcast && !o.isBroadcast) ||
+                      (P.isEmbed &&
+                        P.delivery.isBroadcast &&
+                        P.delivery.isViewable &&
+                        !o.isViewable)
+                      ? P.onBroadcastReopened(P.delivery)
+                      : P.isEmbed || !P.delivery.isViewable || o.isViewable
+                      ? P.isEmbed &&
+                        P.delivery.podcastCompleted &&
+                        !o.podcastCompleted
+                        ? P.onDeliveryViewable(P.delivery)
+                        : P.delivery.isViewable &&
+                          P.isActiveBroadcast &&
+                          P.onBroadcastUpdated(P.delivery)
+                      : P.onDeliveryViewable(P.delivery)
+                    : ((P.isActiveBroadcast = P.delivery.isBroadcast),
+                      P.onDeliverySet(P.delivery)),
+                  (P.webcastVersion = P.delivery.webcastVersionId),
+                  P.isActiveBroadcast
+                    ? ((P.refreshInterval =
+                        P.delivery.broadcastRefreshInterval),
+                      (P.webcastApiRefreshInterval =
+                        P.delivery.webcastApiRefreshInterval))
+                    : P.isEmbed || P.delivery.isViewable
+                    ? P.isEmbed && !P.delivery.podcastCompleted
+                      ? ((P.refreshInterval = P.refreshInterval
+                          ? (P.refreshInterval *= 1.5)
+                          : e.Constants.DeliveryRefreshInterval),
+                        (P.refreshInterval = Math.min(
+                          P.refreshInterval,
+                          t.maxProcessingPingIntervalMsec
+                        )),
+                        (P.webcastApiRefreshInterval = void 0))
+                      : P.delivery.isRecentBroadcast
+                      ? ((P.refreshInterval =
+                          e.Constants.ReopenedBroadcastInterval),
+                        (P.webcastApiRefreshInterval =
+                          P.delivery.webcastApiRefreshInterval))
+                      : ((P.refreshInterval = void 0),
+                        (P.webcastApiRefreshInterval = void 0))
+                    : ((P.refreshInterval =
+                        e.Constants.DeliveryRefreshInterval),
+                      (P.webcastApiRefreshInterval =
+                        P.delivery.webcastApiRefreshInterval)),
+                  ((P.webcastVersion && P.webcastApiRefreshInterval) ||
+                    P.refreshInterval) &&
+                    P.setRefreshTimeout();
               }),
               (this.handleDeliveryError = function (t) {
-                !p.delivery ||
-                p.retryCount >= e.Constants.DeliveryRefreshRetryCount ||
+                !P.delivery ||
+                P.retryCount >= e.Constants.DeliveryRefreshRetryCount ||
                 (t &&
                   t.ErrorCode &&
                   t.ErrorCode !== Panopto.Core.ErrorCode.UnknownError)
-                  ? p.onFatalError(t)
-                  : (p.retryCount++, p.setRefreshTimeout());
+                  ? P.onFatalError(t)
+                  : (P.retryCount++, P.setRefreshTimeout());
+              }),
+              (this.handleWebcastVersionSuccess = function (e) {
+                P.webcastVersion !== e
+                  ? P.refreshDelivery()
+                  : P.refreshInterval && P.setRefreshTimeout();
+              }),
+              (this.handleWebcastVersionError = function (e, t, n) {
+                P.refreshDelivery();
               });
           }
           return (
@@ -3511,12 +4017,21 @@ __extends =
             (t.prototype.stop = function () {
               window.clearTimeout(this.timeoutHandle);
             }),
-            (t.prototype.setRefreshTimeout = function () {
-              this.timeoutHandle = window.setTimeout(
-                this.refreshDelivery,
-                this.refreshInterval
-              );
+            (t.prototype.setInvocationId = function (e) {
+              this.invocationId = e;
             }),
+            (t.prototype.setRefreshTimeout = function () {
+              this.webcastVersion && this.webcastApiRefreshInterval
+                ? (this.timeoutHandle = window.setTimeout(
+                    this.refreshWebcastVersion,
+                    this.webcastApiRefreshInterval
+                  ))
+                : (this.timeoutHandle = window.setTimeout(
+                    this.refreshDelivery,
+                    this.refreshInterval
+                  ));
+            }),
+            (t.maxProcessingPingIntervalMsec = 3e5),
             t
           );
         })();
@@ -4917,15 +5432,18 @@ __extends =
       },
       Fe = function (o) {
         e.setFullscreenPlayer(o),
-          Panopto.viewer.showBrandWhilePlaying &&
-            0 === $("#absoluteControls").find(".logo-while-playing").length &&
-            ((d = new PanoptoViewer.WatermarkLogo(
-              !1,
-              Panopto.branding.embedLogo.png
-            )),
-            $("#absoluteControls #fullscreenControlsWrapper").append(
-              d.getBrandElem()
-            )),
+          Panopto.viewer.viewerWatermarkPosition &&
+            (0 === $("#absoluteControls").find(".logo-while-playing").length &&
+              ((d = new PanoptoViewer.WatermarkLogo(
+                Panopto.branding.embedLogo.png,
+                Panopto.viewer.viewerWatermarkPosition
+              )),
+              $("#absoluteControls #fullscreenControlsWrapper").append(
+                d.getBrandElem()
+              )),
+            Panopto.viewer.viewerWatermarkPosition !==
+              PanoptoViewer.Data.ViewerWatermarkPositionOptions.TopLeft &&
+              d.setOffset(50)),
           t.flowPlayerEnabled &&
             Panopto.Core.Browser.fullscreenEnabled &&
             (o
@@ -5308,7 +5826,7 @@ __extends =
           (Ge = window.setTimeout(function () {
             t.css("cursor", "none"),
               $(".fullscreen-controls").finish().fadeOut(p.FadeInterval),
-              d && d.setHeight(0);
+              d && d.setOffset(0);
           }, 1e3 * p.FullScreenControlInterval));
         var n = a.getPlayerFromElement(t);
         if (Panopto.viewer.allowMultipleSecondaryDisplay) {
@@ -5328,18 +5846,24 @@ __extends =
               ? s.setSecondaryContentContainer(r[0])
               : s.setSecondaryContentContainer(void 0));
         var i = n && n.container().is(".slide-deck");
-        s.updateFullscreenButtons({
-          allowFullscreen: !i,
-          isFullscreen: e.isFullscreen(),
-        }),
+        if (
+          (s.updateFullscreenButtons({
+            allowFullscreen: !i,
+            isFullscreen: e.isFullscreen(),
+          }),
           s.toggleSwap(e.isSecondarySwapAllowed()),
           s.show(t),
-          e.isFullscreen() &&
-            ($(".fullscreen-controls").fadeIn(p.FadeInterval),
-            d && d.setHeight(50),
+          e.isFullscreen())
+        ) {
+          $(".fullscreen-controls").fadeIn(p.FadeInterval);
+          var l =
+            Panopto.viewer.viewerWatermarkPosition !==
+            PanoptoViewer.Data.ViewerWatermarkPositionOptions.TopLeft;
+          d && l && d.setOffset(50),
             $(".fullscreen-controls").on("mouseover", function () {
               clearTimeout(Ge);
-            }));
+            });
+        }
       },
       Qe = function () {
         ie.css({
@@ -7256,7 +7780,12 @@ __extends =
               );
             });
           }
-          if (Panopto.useFreeTrialTerminology && !Panopto.user.userId) {
+          if (
+            Panopto.useFreeTrialTerminology &&
+            !Panopto.user.userId &&
+            i.secondaryStreams &&
+            i.secondaryStreams.length > 0
+          ) {
             (l = Panopto.Core.StringHelpers.parseQueryString(
               window.location.search.slice(1)
             ).tid),
@@ -8047,2194 +8576,6 @@ __extends =
       i
     );
   }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Hive = (function (e) {
-    var t = PanoptoCore.Logging.Logger,
-      n = function (e) {
-        return (
-          Panopto.viewer.isHiveEnabled &&
-          e &&
-          !Panopto.viewer.isKollectiveEnabled &&
-          !Panopto.Core.Browser.isWin7IE11 &&
-          "undefined" != typeof hive
-        );
-      },
-      o = function (e, n) {
-        return {
-          onError: function (o) {
-            var i,
-              a = n.hiveTechOrder.indexOf(e);
-            return (
-              -1 !== a &&
-                ((i =
-                  a < n.hiveTechOrder.length
-                    ? PanoptoTS.StringHelpers.format(
-                        "{0} failed with message: {1}. Falling through to next tech {2} ",
-                        e,
-                        o.message,
-                        n.hiveTechOrder[a + 1]
-                      )
-                    : PanoptoTS.StringHelpers.format(
-                        "{0} failed with message: {1}. End of tech stack falling back to source",
-                        e,
-                        o.message
-                      )),
-                t.warning(i)),
-              !0
-            );
-          },
-          onActiveSession: function (n) {
-            t.info(
-              PanoptoTS.StringHelpers.format(
-                "Session activated with tech {0}, sessionDetails:",
-                e
-              ) + n
-            );
-          },
-        };
-      };
-    return (
-      (e.isHiveOptimized = n),
-      (e.createFlowplayerPlugin = function (e, t) {
-        var i = {};
-        if (n(e.optimizationToken)) {
-          var a = {};
-          a.hiveTechOrder = Panopto.viewer.hiveFlowplayerPluginTechOrder
-            .split(",")
-            .map(function (e) {
-              return e.trim();
-            });
-          var r = a.hiveTechOrder.indexOf("HiveJava");
-          t || -1 === r || a.hiveTechOrder.splice(r, 1),
-            (a.HiveJava = o("HiveJava", a)),
-            (a.HiveJS = o("HiveJS", a)),
-            (a.StatsJS = o("StatsJS", a)),
-            (i = {
-              sources: [
-                { type: "application/x-mpegurl", ticket: e.optimizationToken },
-              ],
-              options: a,
-            });
-        }
-        return i;
-      }),
-      (e.attachFlowplayerHlsJsConfig = function (e, t) {
-        n(e.optimizationToken) && (t.xhrSetup || (t.xhrSetup = function () {}));
-      }),
-      (e.getHiveSourceForReload = function (e, t) {
-        return (
-          e.off("stop.hiveStop"),
-          e.off("finish.hiveFinish"),
-          [{ type: "application/x-mpegurl", ticket: t.optimizationToken }]
-        );
-      }),
-      (e.loadHiveTicket = function (e, n, o, i, a) {
-        e.closeHiveSession(),
-          e.load(n, o, function (e) {
-            t.info(
-              PanoptoTS.StringHelpers.format(
-                "Hive to load ticket: {0} reasons: ",
-                n[0].ticket
-              ) + e
-            ),
-              t.info(
-                PanoptoTS.StringHelpers.format(
-                  "Falling back to source {0}",
-                  i.clip.sources[0].src
-                )
-              ),
-              a(i, o);
-          });
-      }),
-      (e.addCloseHiveSessionToStopAndFinish = function (e) {
-        e.one("stop.hiveStop", function () {
-          e.off("finish.hiveFinish"), e.closeHiveSession();
-        }),
-          e.one("finish.hiveFinish", function () {
-            e.off("stop.hiveStop"), e.closeHiveSession();
-          });
-      }),
-      e
-    );
-  })(Panopto.Viewer.Hive || {})),
-  (Panopto.Viewer.Players = Panopto.Viewer.Players || {}),
-  (function (e) {
-    !(function (t) {
-      var n, o;
-      (n = t.Data || (t.Data = {})),
-        (o = (function () {
-          function n(t) {
-            var n = Panopto.Viewer.Data,
-              o = e.Viewer.Constants,
-              i = t.Delivery.SessionName,
-              a = Panopto.Core.TimeHelpers.formatWin32EpochTimeToDate(
-                t.Delivery.SessionStartTime
-              ),
-              r = t.Delivery.IsActiveBroadcast,
-              s =
-                t.Delivery.IsBroadcast &&
-                t.Delivery.IsViewerEncodeComplete &&
-                new Date().getTime() - a.getTime() <=
-                  o.RecentBroadcastThreshold,
-              l = this.parseStreams(t.Delivery.Streams, i, r),
-              c = l.primaryStreams,
-              d = l.secondaryStreams,
-              u = l.activePrimary,
-              p = l.screenCaptureStream,
-              f = this.parsePlayerInfo(c, u, r),
-              h = f.multiBitrateEnabled,
-              m = f.playSpeedEnabled,
-              v = f.flowPlayerEnabled,
-              y = f.requiresSilverlight,
-              P = this.parseEvents(
-                t.Delivery.Timestamps,
-                t.Delivery.EventTargets,
-                t.Delivery.PublicNotesStreams,
-                t.Delivery.Duration,
-                p
-              ),
-              g = P.slides,
-              S = P.documents,
-              C = P.thumbnails,
-              w = P.contents,
-              b = P.channels;
-            (this.title = i),
-              (this.id = t.Delivery.PublicID),
-              (this.date = a),
-              (this.duration = t.Delivery.Duration),
-              (this.description = t.Delivery.SessionAbstract),
-              (this.ownerId = t.Delivery.OwnerId),
-              (this.ownerFullName = t.Delivery.OwnerDisplayName),
-              (this.ownerBio = t.Delivery.OwnerBio),
-              (this.ownerIsOverQuota = t.Delivery.OwnerIsOverQuota),
-              (this.invocationId = t.InvocationId),
-              (this.embedUrl = t.EmbedUrl),
-              (this.downloadUrl = t.DownloadUrl),
-              (this.podcastCompleted = t.PodcastCompleted),
-              (this.broadcastRefreshInterval =
-                1e3 * t.BroadcastRefreshInterval),
-              (this.broadcastSegmentBackoff = t.BroadcastSegmentBackoff),
-              (this.allowPublicNotes = t.AllowPublicNotes),
-              (this.hasAnyLinks = t.Delivery.HasAnyLinks),
-              (this.hasQuiz = t.Delivery.HasQuiz),
-              (this.firstQuizOffset = t.Delivery.FirstQuizOffset),
-              (this.hasCaptions = t.Delivery.HasCaptions),
-              (this.availableLanguages = t.Delivery.AvailableLanguages),
-              (this.isBroadcast = r),
-              (this.isViewable = (r && u) || t.Delivery.IsViewerEncodeComplete),
-              (this.isReadyForEditing = t.Delivery.IsReadyForEditing),
-              (this.RehydrationAvailable = t.Delivery.RehydrationAvailable),
-              (this.isPurgedEncode = t.Delivery.IsPurgedEncode),
-              (this.isPurgedLegacyEncode = t.Delivery.IsPurgedLegacyEncode),
-              (this.requiresAdvancedEditor = t.Delivery.RequiresAdvancedEditor),
-              (this.broadcastEnded = t.Delivery.BroadcastEnded),
-              (this.broadcastInterrupted = t.Delivery.BroadcastInterrupted),
-              (this.isRecentBroadcast = s),
-              (this.isPrimaryAudioOnly = t.Delivery.IsPrimaryAudioOnly),
-              (this.requiresSilverlight = y),
-              (this.flowPlayerEnabled = v),
-              (this.multiBitrateEnabled = h),
-              (this.playSpeedEnabled = m),
-              (this.discussionEnabled = t.Delivery.DiscussionEnabled),
-              (this.discussionCacheSeconds = t.DiscussionCacheSeconds),
-              (this.lastViewingPosition = t.LastViewingPosition),
-              (this.completionPercentage = t.CompletionPercentage),
-              (this.activePrimary = u),
-              (this.primaryStreams = c),
-              (this.secondaryStreams = d),
-              (this.slideDecks = g.length ? [n.SlideDeck(g)] : []),
-              (this.documents = S),
-              (this.thumbnails = C),
-              (this.captions = []),
-              (this.contents = w),
-              (this.channels = b),
-              (this.tags = t.Delivery.Tags),
-              (this.user = {
-                email: t.UserEmail,
-                name: t.UserName,
-                key: (t.UserKey || "").toLowerCase(),
-                rating: t.UserRating,
-                role: t.SessionRole,
-                canCreateQuestionLists: t.UserCanCreateQuestionLists,
-                permissions: t.Delivery.Permissions || [],
-              }),
-              (this.folder = {
-                name: t.Delivery.SessionGroupLongName,
-                description: t.Delivery.SessionGroupAbstract,
-                id: t.Delivery.SessionGroupPublicID,
-              }),
-              (this.nextDelivery = void 0),
-              t.Delivery.NextDeliveryUrl &&
-                (this.nextDelivery = {
-                  id: t.Delivery.NextDeliveryId,
-                  url: t.Delivery.NextDeliveryUrl,
-                  title: t.Delivery.NextDeliveryTitle,
-                  description: t.Delivery.NextDeliveryDescription,
-                  duration: Panopto.Core.TimeHelpers.formatDuration(
-                    t.Delivery.NextDeliveryDuration,
-                    Panopto.GlobalResources.TimeSeparator
-                  ),
-                  thumbUrl: t.Delivery.NextDeliveryThumbUrl,
-                  isLive: t.Delivery.NextDeliveryIsLive,
-                  folderName: void 0,
-                }),
-              (this.serverModel = t);
-          }
-          return (
-            (n.prototype.parseStreams = function (e, n, o) {
-              var i = _.map(
-                  _.filter(e, function (e) {
-                    return "Archival" === e.StreamTypeName;
-                  }),
-                  function (e) {
-                    return Panopto.Viewer.Data.Stream(e, o, n);
-                  }
-                ),
-                a = (i = _.sortBy(i, "relativeStart")).length
-                  ? o
-                    ? _.find(i, function (e) {
-                        return !e.relativeEnd;
-                      }) ||
-                      _.max(i, function (e) {
-                        return e.relativeEnd;
-                      })
-                    : i[0]
-                  : void 0,
-                r = o ? i : a ? [a] : [],
-                s = _.map(
-                  _.filter(e, function (e) {
-                    return "Archival" !== e.StreamTypeName;
-                  }),
-                  function (e) {
-                    return Panopto.Viewer.Data.Stream(e, o, n);
-                  }
-                );
-              return {
-                primaryStreams: r,
-                secondaryStreams: s,
-                activePrimary: a,
-                screenCaptureStream: _.find(s, function (e) {
-                  return e.tabClass === t.Constants.ScreenCaptureClass;
-                }),
-              };
-            }),
-            (n.prototype.parsePlayerInfo = function (e, n, o) {
-              var i = !!n && _.contains(["ism", "wmv"], n.fileType),
-                a =
-                  !new RegExp(Panopto.features.hlsFlashFallbackRegex).test(
-                    navigator.userAgent
-                  ) &&
-                  !Panopto.Core.Browser.isWin7IE11 &&
-                  _.any(flowplayer.engines, function (e) {
-                    return (
-                      "hlsjs" === e.engineName || "hlsjs-lite" === e.engineName
-                    );
-                  }),
-                r = Panopto.Core.Browser.supportsVideo(t.Constants.MP4MimeType),
-                s =
-                  ((!e.length || "hls" === n.fileType) && a) ||
-                  ((!e.length || "mp4" === n.fileType) && r),
-                l = Panopto.viewer.flowplayerEnabled && !i && s,
-                c = !1;
-              n &&
-                (c =
-                  "ism" === n.fileType ||
-                  ("hls" === n.fileType &&
-                    (l || Panopto.Core.Browser.flashEnabled())));
-              var d = !1;
-              return (
-                !o &&
-                  n &&
-                  (d =
-                    l ||
-                    ("mp4" === n.fileType && r) ||
-                    ("hls" === n.fileType && n.httpUrl && r) ||
-                    ("wmv" === n.fileType && !Panopto.Core.Browser.isWebkit)),
-                {
-                  multiBitrateEnabled: c,
-                  playSpeedEnabled: d,
-                  flowPlayerEnabled: l,
-                  requiresSilverlight: i,
-                }
-              );
-            }),
-            (n.prototype.parseEvents = function (t, n, o, i, a) {
-              var r = Panopto.Viewer.Data,
-                s = _.filter(t, function (e) {
-                  return (
-                    (e.Time || 0 === e.Time) &&
-                    e.Time <= i &&
-                    e.ObjectIdentifier &&
-                    e.ObjectSequenceNumber
-                  );
-                }),
-                l = _.filter(s, function (e) {
-                  return "PowerPoint" === e.EventTargetType;
-                }),
-                c = _.filter(s, function (e) {
-                  return e.Url;
-                }),
-                d = [];
-              _.each(c, function (t) {
-                return d.push(new e.Viewer.Data.Document(t));
-              }),
-                _.each(n, function (t) {
-                  return d.push(new e.Viewer.Data.Document(t));
-                });
-              var u = _.filter(s, function (e) {
-                return (
-                  !e.Url &&
-                  _.contains(
-                    ["ObjectVideo", "Primary", "SmartOcrToc"],
-                    e.EventTargetType
-                  )
-                );
-              }).concat(l);
-              u.sort(function (e, t) {
-                return e.Time - t.Time;
-              });
-              var p,
-                f = _.map(u, function (t) {
-                  return new e.Viewer.Data.Thumbnail(t, a);
-                }),
-                h = _.chain(u.concat(c))
-                  .unique()
-                  .map(function (t) {
-                    return new e.Viewer.Data.Event(t);
-                  })
-                  .filter(function (e) {
-                    return !!jQuery.trim(e.text);
-                  })
-                  .value();
-              return (
-                o &&
-                  (p = _.map(o, function (e) {
-                    return r.Channel(e, e, !0);
-                  })),
-                {
-                  slides: l,
-                  documents: d,
-                  thumbnails: f,
-                  contents: h,
-                  channels: p,
-                }
-              );
-            }),
-            n
-          );
-        })()),
-        (n.Delivery = o);
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {})),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
-  (Panopto.Viewer.Data.Stream = function (e, t, n) {
-    var o,
-      i = [],
-      a = [],
-      r =
-        e.Name ||
-        ("SCREEN" === e.Tag
-          ? Panopto.GlobalResources.ViewerPlus_ScreenCaptureTitle
-          : Panopto.GlobalResources.ViewerPlus_ObjectVideoTitle),
-      s =
-        "SCREEN" === e.Tag
-          ? PanoptoTS.Viewer.Constants.ScreenCaptureClass
-          : PanoptoTS.Viewer.Constants.ObjectVideoTabClass,
-      l = function (e, n) {
-        var o = e - PanoptoTS.Viewer.Constants.SecondaryStreamOffset;
-        return t || (n && o <= n + PanoptoTS.Viewer.Constants.MinSegmentGap)
-          ? e
-          : Math.max(0, o);
-      };
-    switch (
-      (e.RelativeSegments && e.RelativeSegments.length
-        ? _.each(e.RelativeSegments, function (e, t) {
-            var n = new PanoptoTS.Viewer.Data.SecondarySegment(e),
-              o = a[t - 1];
-            (n.timelineStart = l(n.relativeStart, o ? o.relativeEnd : 0)),
-              a.push(n),
-              i.push(n.timelineStart, n.relativeEnd);
-          })
-        : (i.push(l(e.RelativeStart, void 0)),
-          e.RelativeEnd && i.push(e.RelativeEnd)),
-      ((o = PanoptoTS.Viewer.Data.ContentHelpers.createBaseContent(
-        r,
-        e.PublicID,
-        s,
-        i,
-        e.AbsoluteStart,
-        "",
-        "",
-        !1,
-        !1,
-        !1,
-        t,
-        !1
-      )).url = e.StreamUrl),
-      (o.httpUrl = e.StreamHttpUrl),
-      (o.fileType = e.ViewerMediaFileTypeName),
-      (o.relativeStart = e.RelativeStart),
-      (o.relativeEnd = e.RelativeEnd),
-      (o.length = e.RelativeEnd ? e.RelativeEnd - e.RelativeStart : 0),
-      (o.segments = a),
-      (o.interrupted = e.Interrupted),
-      (o.editFileType = e.EditMediaFileTypeName),
-      (o.deliveryTitle = n),
-      (o.broadcastSegmentDuration = e.BroadcastSegmentDuration),
-      (o.broadcastSegmentBackoff =
-        e.BroadcastSegmentBackoff || Panopto.viewer.broadcastSegmentBackoff),
-      (o.vrType = e.VRType),
-      Panopto.viewer.pureHlsJsPlayback &&
-        o.vrType !== PanoptoViewer.MediaVRType.None &&
-        (Panopto.Core.Browser.isSafari || Panopto.Core.Browser.isIE) &&
-        (window.location.href = window.location.href + "&pureHlsJs=false"),
-      e.Tag)
-    ) {
-      case "AUDIO":
-        (o.type =
-          Panopto.Core.ServiceInterface.Rest.Objects.StreamContentType.Audio),
-          (o.isAudioOnly = !0);
-        break;
-      case "SCREEN":
-        (o.type =
-          Panopto.Core.ServiceInterface.Rest.Objects.StreamContentType.Screen),
-          (o.isAudioOnly = !1);
-        break;
-      default:
-        (o.type =
-          Panopto.Core.ServiceInterface.Rest.Objects.StreamContentType.Camera),
-          (o.isAudioOnly = !1);
-    }
-    return (o.optimizationToken = e.OptimizationToken), o;
-  }),
-  (function (e) {
-    !(function (e) {
-      !(function (e) {
-        var t = function (e) {
-          (this.relativeStart = e.RelativeStart),
-            (this.relativeEnd = e.End
-              ? e.RelativeStart + (e.End - e.Start)
-              : 1 / 0),
-            (this.streamOffset = e.Start);
-        };
-        e.SecondarySegment = t;
-      })(e.Data || (e.Data = {}));
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {})),
-  (function (e) {
-    !(function (e) {
-      !(function (e) {
-        var t = (function () {
-          function e() {}
-          return (
-            (e.prototype.getStreamFriendlyType = function () {
-              var e;
-              switch (this.type) {
-                case Panopto.Core.ServiceInterface.Rest.Objects
-                  .StreamContentType.Audio:
-                  e = Panopto.GlobalResources.ViewerPlus_AudioTitle;
-                  break;
-                case Panopto.Core.ServiceInterface.Rest.Objects
-                  .StreamContentType.Screen:
-                case Panopto.Core.ServiceInterface.Rest.Objects
-                  .StreamContentType.Slide:
-                  e = Panopto.GlobalResources.ViewerPlus_ScreenCaptureTitle;
-                  break;
-                case Panopto.Core.ServiceInterface.Rest.Objects
-                  .StreamContentType.Camera:
-                default:
-                  e = Panopto.GlobalResources.ViewerPlus_ObjectVideoTitle;
-              }
-              return e;
-            }),
-            (e.prototype.getStreamName = function () {
-              return this.name || this.getStreamFriendlyType();
-            }),
-            (e.convertFromApiModel = function (t) {
-              var n = new e();
-              return (
-                (n.id = t.id),
-                (n.url = t.url),
-                (n.httpUrl = t.httpUrl),
-                (n.absoluteStart = t.absoluteStart),
-                (n.duration = t.duration),
-                (n.thumbnailUrlBase = t.thumbnailUrlBase),
-                (n.thumbnailInterval = t.thumbnailInterval),
-                (n.type = t.type),
-                (n.vrType = t.vrType),
-                (n.name = t.name),
-                (n.iconCode = t.iconCode),
-                (n.absoluteEnd = t.absoluteEnd()),
-                (n.streamType = t.isPrimary ? 1 : 2),
-                (n.normalizeVolume = t.normalizeVolume),
-                n
-              );
-            }),
-            e
-          );
-        })();
-        e.Stream = t;
-      })(e.Data || (e.Data = {}));
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {})),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (Panopto.Viewer.Tabs.AttachmentTab = function (e, t, n, o, i, a) {
-    var r = [],
-      s = _.template(
-        '\n        <a id="slidesDownload"\n            class="slide-download-link"\n            title="<@- fileName @>"\n            href="<@- slideDownloadHref @>"\n        >\n            <i class="material-icons md-24">file_download</i>\n            <span><@- fileName @></span>\n        </a>\n    '
-      ),
-      l = PanoptoLegacy.Viewer.Tabs.ViewerEventTab(
-        e,
-        t,
-        n,
-        o,
-        r,
-        PanoptoViewer.EventType.None,
-        !1,
-        Panopto.Viewer.Analytics.Labels.Attachment,
-        i,
-        a
-      );
-    l.render(r, !0, void 0, void 0, void 0);
-    var c, d, u;
-    return (
-      (c = t.find("#slideDownloadContainer")),
-      (d = function (e) {
-        var t = { id: o, tid: i, sdid: e };
-        return Panopto.Core.StringHelpers.addQueryParameter(
-          Panopto.uriScheme +
-            "://" +
-            Panopto.webServerFQDN +
-            Panopto.appRoot +
-            "/Handlers/SlideDeckDownload.ashx",
-          t
-        );
-      }),
-      (u = $.Deferred()),
-      Panopto.Core.ServiceInterface.Rest.Sessions.getAllSlideDecks(
-        o,
-        function (e) {
-          u.resolve(e);
-        },
-        function () {
-          u.reject();
-        }
-      ),
-      u.then(function (e) {
-        e.filter(function (e) {
-          return e.isDownloadAllowed;
-        }).forEach(function (e) {
-          return (
-            (t = e.id),
-            (n = e.name),
-            (o = $(s({ slideDownloadHref: d(t), fileName: n }))),
-            void c.append(o)
-          );
-          var t, n, o;
-        });
-      }),
-      l
-    );
-  }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
-  (PanoptoLegacy.Viewer.Tabs.BookmarksTab = function (e, t, n, o, i, a, r) {
-    var s = !1,
-      l = PanoptoLegacy.Viewer.Tabs.EditableEventTab(
-        e,
-        t,
-        n,
-        o,
-        [],
-        PanoptoViewer.EventType.Bookmark,
-        !1,
-        i,
-        Panopto.GlobalResources.ViewerPlus_CreateBookmark,
-        Panopto.GlobalResources.ViewerPlus_CreateBookmark_None,
-        Panopto.GlobalResources.ViewerPlus_Bookmarks_SignIn,
-        Panopto.Viewer.Analytics.Labels.Bookmark,
-        void 0,
-        void 0,
-        a,
-        r
-      ),
-      c = Panopto.Core.Extensions.base(l),
-      d = t.find(".event-input");
-    return (
-      (l.selected = function (e) {
-        return (
-          void 0 !== e && e && !s && (d.hide(), l.fetch(), (s = !0)),
-          c.selected(e)
-        );
-      }),
-      (l.render = function (e, t, n, o, a) {
-        s && i.key && d.show(), c.render(e, t, n, o, a);
-      }),
-      l
-    );
-  }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
-  (PanoptoLegacy.Viewer.Tabs.CommentsTab = function (
-    e,
-    t,
-    n,
-    o,
-    i,
-    a,
-    r,
-    s,
-    l,
-    c
-  ) {
-    var d,
-      u,
-      p = [],
-      f = t.find(".event-tab-list"),
-      h = Panopto.GlobalResources.ViewerPlus_AddComment,
-      m = PanoptoLegacy.Viewer.Tabs.EditableEventTab(
-        e,
-        t,
-        n,
-        o,
-        p,
-        PanoptoViewer.EventType.Comment,
-        !1,
-        a,
-        h,
-        h,
-        Panopto.GlobalResources.ViewerPlus_Comments_SignIn,
-        Panopto.Viewer.Analytics.Labels.Comment,
-        i,
-        void 0,
-        r,
-        c
-      ),
-      v = m,
-      y = Panopto.Core.Extensions.base(m),
-      P = t.find("#commentsListFooter"),
-      g = t.find("#commentsDownload"),
-      S = function () {
-        e.find(".text").text(
-          0 === p.length
-            ? Panopto.GlobalResources.ViewerPlus_CommentsHeader
-            : Panopto.GlobalResources.ViewerPlus_CommentHeader_Variable.format(
-                p.length
-              )
-        );
-      },
-      C = function () {
-        r &&
-          (clearInterval(u),
-          (u = setInterval(function () {
-            m.fetch(void 0, void 0, void 0, void 0, !0);
-          }, 1e3 * s)));
-      };
-    m.render = function (e, t) {
-      a.key
-        ? _.each(e, function (e) {
-            (e.editable = e.saved && e.user === a.key),
-              (e.deletable =
-                e.saved &&
-                (e.editable || a.role > Panopto.Data.AclRoleType.Viewer)),
-              (e.replyable = !0);
-          })
-        : _.each(e, function (e) {
-            e.replyable = !1;
-          }),
-        d
-          ? d.syncComments(e, t)
-          : (d = new PanoptoTS.Viewer.Tabs.Discussion.Discussion({
-              target: f,
-              events: e,
-              panoptoGlobal: Panopto,
-              eventClickedCallback: m.seekToEvent,
-              editClickedCallback: m.editEventClicked,
-              deleteClickedCallback: m.deleteEventClicked,
-              submitNewEventCallback: function (e, t) {
-                return m.saveNewEvent(e, t, void 0);
-              },
-            })).render(),
-        e && e.length > 0 && l
-          ? (P.show(), g.attr("href", w()), g.show())
-          : (P.hide(), g.hide()),
-        S();
-    };
-    var w = function () {
-      var e = { id: o, tid: i };
-      return Panopto.Core.StringHelpers.addQueryParameter(
-        Panopto.uriScheme +
-          "://" +
-          Panopto.webServerFQDN +
-          Panopto.appRoot +
-          "/Handlers/DiscussionDownload.ashx",
-        e
-      );
-    };
-    return (
-      (m.remove = function (e) {
-        _.each(e, function (e) {
-          p.splice(p.indexOf(e), 1), d.removeComment(e);
-        }),
-          m.updatePlaceholderText(),
-          S();
-      }),
-      (m.addEvent = function (e, t) {
-        var n = $(".reply-to-flag").data("replyToTime"),
-          o = n || t;
-        clearInterval(u), y.addEvent(e, o, void 0, C);
-      }),
-      (m.editEvent = function (e, t) {
-        clearInterval(u), y.editEvent(e, t, C);
-      }),
-      (m.deleteEvent = function (e) {
-        clearInterval(u), y.deleteEvent(e, C);
-      }),
-      (m.position = function (e) {
-        y.position(e),
-          r &&
-            n.isActiveBroadcast() &&
-            v.toggleBroadcastIsLiveOrEnded(n.isLive());
-      }),
-      (v.toggleBroadcastIsLiveOrEnded = function (e) {
-        m.isInputDisabled() && e
-          ? m.inputDisabled(!1)
-          : m.isInputDisabled() ||
-            e ||
-            m.inputDisabled(
-              Panopto.GlobalResources.ViewerPlus_Comments_SkipToLive
-            );
-      }),
-      (m.getEventTime = function () {
-        var e = $(".reply-to-flag").data("replyToTime");
-        return e || y.getEventTime();
-      }),
-      (m.focusEvent = function (e) {
-        d.scrollCommentIntoView(e), y.focusEvent(e);
-      }),
-      m.fetch(),
-      C(),
-      v
-    );
-  }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
-  (PanoptoLegacy.Viewer.Tabs.ContentsTab = function (e, t, n, o, i, a) {
-    var r = PanoptoLegacy.Viewer.Tabs.ViewerEventTab(
-      e,
-      t,
-      n,
-      o,
-      [],
-      PanoptoViewer.EventType.Slide,
-      !0,
-      Panopto.Viewer.Analytics.Labels.Content,
-      void 0,
-      a
-    );
-    return r.render(i, !0, void 0, void 0, void 0), r;
-  }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (PanoptoLegacy.Viewer.Tabs.DetailsTab = function (
-    e,
-    t,
-    n,
-    o,
-    i,
-    a,
-    r,
-    s,
-    l,
-    c,
-    d,
-    u,
-    p,
-    f
-  ) {
-    var h = Panopto.features.tagsEnabled
-        ? PanoptoTS.Viewer.Data.TagHelper.convertDeliveryToModel(r)
-        : [],
-      m =
-        !Panopto.Core.Browser.inIframe() || Panopto.viewer.linksEnabledInIframe,
-      v = Panopto.DetailsTab($("#detailsTab"), {
-        isVisible: !1,
-        sessionId: o,
-        name: i,
-        description: a,
-        tags: h,
-        ownerId: s,
-        ownerFullName: l,
-        ownerBio: c,
-        linkify: m,
-        tagsEnabled: Panopto.features.tagsEnabled,
-        tagService: u,
-        subscriptionsEnabled: Panopto.features.subscriptionsEnabled,
-        subscriptionService: p,
-        userService: f,
-        resources: Panopto.GlobalResources,
-      }),
-      y = PanoptoLegacy.Viewer.Tabs.EventTab(
-        e,
-        t,
-        n,
-        void 0,
-        [],
-        void 0,
-        !1,
-        void 0,
-        void 0,
-        d
-      );
-    return (
-      (y.onSelectChangeRendered = function (e) {
-        var t = e.selected;
-        return v.setProps({ isVisible: t });
-      }),
-      y
-    );
-  }),
-  ((Panopto = Panopto || {}).Core = Panopto.Core || {}),
-  (Panopto.Core.Key = Panopto.Core.Key || {}),
-  (Panopto.UI = Panopto.UI || {}),
-  (Panopto.UI.Input = Panopto.UI.Input || {}),
-  (Panopto.Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
-  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (PanoptoLegacy.Viewer.Tabs.EditableEventTab = function (
-    e,
-    t,
-    n,
-    o,
-    i,
-    a,
-    r,
-    s,
-    l,
-    c,
-    d,
-    u,
-    p,
-    f,
-    h,
-    m
-  ) {
-    var v,
-      y,
-      P = PanoptoTS.Viewer.Constants,
-      g = Panopto.Viewer.Analytics,
-      S = PanoptoLegacy.Viewer.Tabs.ViewerEventTab(
-        e,
-        t,
-        n,
-        o,
-        i,
-        a,
-        r,
-        u,
-        p,
-        m
-      ),
-      C = S,
-      w = Panopto.Core.Extensions.base(S);
-    t.append(_.template($("#eventTabInputTemplate").html())({}));
-    var b,
-      T = t.find(".event-input"),
-      A = t.find(".cancel-editing"),
-      E = "editing",
-      V = 0,
-      I = T.height();
-    C.updatePlaceholderText = function () {
-      T.attr("placeholder", b || (i.length ? l : c)), T.attr("aria-label", l);
-    };
-    var k = function (e) {
-        e
-          ? ((v = e),
-            t.find("#" + e.id).toggleClass(E, !0),
-            T.val(e.text).focus().select(),
-            D(void 0),
-            A.show(),
-            T.prop("disabled", !1).toggleClass(E, !0))
-          : (v &&
-              (t.find("#" + v.id).toggleClass(E, !1),
-              A.hide(),
-              T.toggleClass(E, !1)),
-            (v = void 0),
-            T.val(""),
-            D(I),
-            C.updatePlaceholderText(),
-            (y = void 0),
-            b && T.prop("disabled", !0));
-      },
-      R = function (e, n, o, i) {
-        var a = t.find("#" + e.id),
-          r = a.find(".event-error");
-        r.find(".event-error-message").text(n),
-          Panopto.Core.UI.Handlers.button(r.find(".event-error-retry"), o),
-          Panopto.Core.UI.Handlers.button(r.find(".event-error-cancel"), i),
-          a.toggleClass("errored", !0);
-      };
-    (C.wireUpEditMenu = function (e) {
-      var n = t.find("#" + e.id),
-        o = new PanoptoTS.Viewer.Controls.EditEventMenu(
-          n,
-          n.find(".event-edit-toggle"),
-          Panopto.GlobalResources,
-          { toggleAppearsOnHover: !0 }
-        );
-      o.editCallbacks.add(function (e) {
-        C.editEventClicked(e);
-      }),
-        o.deleteCallbacks.add(function (e) {
-          C.deleteEventClicked(e);
-        }),
-        o.setEvent(e, { canEdit: e.editable, canDelete: e.deletable });
-    }),
-      (C.editEventClicked = function (e) {
-        k(!1), k(e);
-      }),
-      (C.deleteEventClicked = function (e) {
-        (e.saved = !1),
-          S.render([e], !1, void 0, void 0, void 0),
-          C.deleteEvent(e);
-      });
-    var D = function (e) {
-      var t = T.innerHeight() - T.height();
-      T.height(1);
-      var n = T[0].scrollHeight,
-        o = e || n - t;
-      T.height(o);
-    };
-    if (s.key)
-      T.keyup(function () {
-        var e = jQuery.trim(T.val());
-        e && void 0 === y ? (y = C.getEventTime()) : e || (y = void 0);
-      }),
-        T.on("paste input", function () {
-          D(void 0);
-        }),
-        T.keydown(function (e) {
-          (e.ctrlKey && e.keyCode === Panopto.Core.Key.UpArrow) ||
-            (e.stopPropagation(),
-            e.keyCode !== Panopto.Core.Key.Enter || e.shiftKey
-              ? e.keyCode === Panopto.Core.Key.Esc && C.resetInput()
-              : (e.preventDefault(),
-                void 0 === y && T.keyup(),
-                C.submitEvent(void 0)));
-        }),
-        Panopto.Core.UI.Handlers.button(A, function () {
-          k(!1);
-        }),
-        l && C.updatePlaceholderText();
-    else {
-      T.hide();
-      var x = _.template($("#eventTabSignInTemplate").html());
-      t.find(".event-signin")
-        .html(
-          PanoptoTS.StringHelpers.format(
-            d,
-            x({
-              url: PanoptoTS.StringHelpers.format(
-                "{0}?ReturnUrl={1}",
-                Panopto.loginUrl,
-                encodeURIComponent(window.location.href)
-              ),
-              text: Panopto.GlobalResources.ViewerPlus_EventTab_SignIn,
-            })
-          )
-        )
-        .show();
-    }
-    return (
-      (S.resize = function (e, t) {
-        var n = T.is(":visible") ? T.outerHeight(!0) : 0;
-        A.is(":visible") && (n += A.outerHeight(!0)),
-          T.width(e - P.InputMargin),
-          w.resize(e, t - n);
-      }),
-      (S.render = function (e, t) {
-        s.key &&
-          _.each(e, function (e) {
-            (e.editable = e.saved && e.user === s.key),
-              (e.deletable =
-                e.saved &&
-                (e.editable || s.role > Panopto.Data.AclRoleType.Viewer));
-          }),
-          f &&
-            _.each(e, function (e) {
-              delete e.time;
-            }),
-          w.render(e, t),
-          _.each(e, function (e) {
-            (e.editable || e.deletable) && C.wireUpEditMenu(e);
-          }),
-          C.updatePlaceholderText(),
-          n.resize();
-      }),
-      (S.remove = function (e) {
-        w.remove(e), C.updatePlaceholderText();
-      }),
-      (C.addEvent = function (e, t, n, i) {
-        m.createEvent(
-          o,
-          a,
-          e.text,
-          t,
-          !f,
-          n,
-          h,
-          function (t) {
-            (e.eventId = t.EventID),
-              (e.eventPublicId = t.PublicId),
-              (e.sessionId = t.SessionId),
-              (e.saved = !0),
-              S.render([e], !1, void 0, void 0, void 0),
-              S.toggleLoading(!1),
-              g.sendEvent({ action: g.Actions.Add.Success, label: u }),
-              i && i();
-          },
-          function () {
-            R(
-              e,
-              Panopto.GlobalResources.ViewerPlus_EventTab_AddError,
-              function () {
-                C.addEvent(e, t, n, i),
-                  g.sendEvent({ action: g.Actions.Add.Retry, label: u });
-              },
-              function () {
-                S.remove([e]),
-                  g.sendEvent({ action: g.Actions.Add.Cancel, label: u });
-              }
-            ),
-              S.toggleLoading(!1),
-              g.sendEvent({ action: g.Actions.Add.Error, label: u }),
-              i && i();
-          }
-        );
-      }),
-      (C.editEvent = function (e, t, n) {
-        m.editEvent(
-          e.sessionId,
-          e.type || a,
-          e.eventPublicId,
-          e.text,
-          function () {
-            (e.saved = !0),
-              S.render([e], !1, void 0, void 0, void 0),
-              S.toggleLoading(!1),
-              g.sendEvent({ action: g.Actions.Edit.Success, label: u }),
-              n && n();
-          },
-          function () {
-            R(
-              e,
-              Panopto.GlobalResources.ViewerPlus_EventTab_EditError,
-              function () {
-                C.editEvent(e, t, n),
-                  g.sendEvent({ action: g.Actions.Edit.Retry, label: u });
-              },
-              function () {
-                (e.text = t),
-                  (e.saved = !0),
-                  S.render([e], !1, void 0, void 0, void 0),
-                  g.sendEvent({ action: g.Actions.Edit.Cancel, label: u });
-              }
-            ),
-              S.toggleLoading(!1),
-              g.sendEvent({ action: g.Actions.Edit.Error, label: u }),
-              n && n();
-          }
-        );
-      }),
-      (C.deleteEvent = function (e, t) {
-        S.toggleLoading(!0),
-          m.deleteEvent(
-            e.sessionId,
-            e.type || a,
-            e.eventPublicId,
-            function () {
-              e === v && k(!1),
-                S.remove([e]),
-                S.toggleLoading(!1),
-                g.sendEvent({ action: g.Actions.Delete.Success, label: u }),
-                t && t();
-            },
-            function () {
-              R(
-                e,
-                Panopto.GlobalResources.ViewerPlus_EventTab_DeleteError,
-                function () {
-                  C.deleteEvent(e, t),
-                    g.sendEvent({ action: g.Actions.Delete.Retry, label: u });
-                },
-                function () {
-                  (e.saved = !0),
-                    C.render([e], !1, void 0, void 0, void 0),
-                    g.sendEvent({ action: g.Actions.Delete.Cancel, label: u });
-                }
-              ),
-                S.toggleLoading(!1),
-                g.sendEvent({ action: g.Actions.Delete.Error, label: u }),
-                t && t();
-            }
-          );
-      }),
-      (C.submitEvent = function (e) {
-        var t,
-          n,
-          o = jQuery.trim(T.val());
-        o &&
-          (T.val(""),
-          D(I),
-          S.toggleLoading(!0),
-          v
-            ? ((t = v),
-              k(!1),
-              (n = t.text),
-              (t.text = o),
-              (t.saved = !1),
-              S.render([t], !1, void 0, void 0, void 0),
-              C.editEvent(t, n))
-            : C.saveNewEvent(o, y, e));
-      }),
-      (C.saveNewEvent = function (e, t, n) {
-        var o = f ? t - new Date().getTime() / 1e3 : t,
-          i = {
-            id: a + V.toString(),
-            text: e,
-            time: t,
-            creationTime: Panopto.Core.TimeHelpers.currentWin32EpochTime(),
-            user: s.key,
-            userDisplayName: Panopto.viewer.displayFullNamesInDiscussion
-              ? s.name
-              : s.key,
-          };
-        S.render([i], !1, void 0, void 0, void 0),
-          (y = void 0),
-          V++,
-          C.addEvent(i, o, n),
-          C.focusEvent(i);
-      }),
-      (C.inputDisabled = function (e) {
-        if (void 0 === e) return !!b;
-        v && k(!1),
-          (b = e),
-          T.prop("disabled", !!b).val(""),
-          C.updatePlaceholderText();
-      }),
-      (C.isInputDisabled = C.inputDisabled),
-      (C.getEventTime = function () {
-        return f ? new Date().getTime() / 1e3 : n.position();
-      }),
-      (C.resetInput = function () {
-        k(!1);
-      }),
-      (C.focusEvent = function (e) {}),
-      C
-    );
-  }),
-  ((Panopto = Panopto || {}).UI = Panopto.UI || {}),
-  (Panopto.UI.Components = Panopto.UI.Components || {}),
-  (Panopto.UI.Accessibility = Panopto.UI.Accessibility || {}),
-  (Panopto.Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
-  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (PanoptoLegacy.Viewer.Tabs.EventTab = function (
-    e,
-    t,
-    n,
-    o,
-    i,
-    a,
-    r,
-    s,
-    l,
-    c
-  ) {
-    var d = PanoptoTS.Viewer.Constants,
-      u = Panopto.Viewer.Analytics,
-      p = {};
-    t.prepend(_.template($("#eventTabErrorTemplate").html())({}));
-    var f,
-      h,
-      m = $("#eventTemplate"),
-      v = t.find(".event-tab-scroll-pane"),
-      y = t.find(".event-tab-list"),
-      P = t.find(".event-tab-spinner"),
-      g = t.find(".event-tab-error"),
-      S = t.find(".event-tab-help"),
-      C = !1,
-      w = Panopto.Core.UI.Components.scrollingHighlight(
-        v,
-        !0,
-        d.EventScrollTimeout
-      ),
-      b = function (e) {
-        w.highlight(
-          _.find(i, function (t) {
-            return t.id === e.id;
-          }),
-          function (e) {
-            p.seekToEvent(e);
-          }
-        );
-      };
-    p.seekToEvent = function (e) {
-      n.userSeekEnabled() &&
-        (n.setPosition(e.time),
-        u.sendEvent({ action: u.Actions.Navigate, label: s }));
-    };
-    var T = function (e, t) {
-        var n =
-          a === PanoptoViewer.EventType.Comment
-            ? e.creationTime - t.creationTime
-            : e.time - t.time;
-        return n || e.id === t.id || (n = e.id < t.id ? -1 : 1), n;
-      },
-      A = Panopto.Core.UI.Accessibility.tab(e, t),
-      E =
-        !Panopto.Core.Browser.inIframe() || Panopto.viewer.linksEnabledInIframe;
-    return (
-      Panopto.Branding.animateLoadingIndicator(Panopto.branding.accentColor),
-      (p.isHeaderVisible = function () {
-        return C;
-      }),
-      (p.toggleHeader = function (t) {
-        (C = t), e.toggle(t);
-      }),
-      p.toggleHeader(!0),
-      y.keydown(function (e) {
-        if (
-          (!e.ctrlKey &&
-            _.contains([d.VolumeUpKeyCode, d.VolumeDownKeyCode], e.keyCode) &&
-            e.stopPropagation(),
-          e.keyCode === Panopto.Core.Key.UpArrow ||
-            e.keyCode === Panopto.Core.Key.RightArrow ||
-            e.keyCode === Panopto.Core.Key.DownArrow ||
-            e.keyCode === Panopto.Core.Key.LeftArrow)
-        ) {
-          var t = y.find(".index-event:focus"),
-            n = void 0;
-          e.keyCode === Panopto.Core.Key.UpArrow ||
-          e.keyCode === Panopto.Core.Key.LeftArrow
-            ? (n = t.prev(".index-event"))
-            : (e.keyCode !== Panopto.Core.Key.DownArrow &&
-                e.keyCode !== Panopto.Core.Key.RightArrow) ||
-              (n = t.next(".index-event")),
-            n.length &&
-              (t.attr("tabindex", -1), n.focus(), n.attr("tabindex", 0)),
-            e.stopPropagation();
-        }
-      }),
-      S.toggle(E),
-      Panopto.Core.UI.Handlers.button(e, function () {
-        return n.fireTabSelected(p);
-      }),
-      e.focus(function () {
-        return n.fireTabSelected(p);
-      }),
-      (p.isSameEventRendering = function (e, t) {
-        return (
-          e.id === t.id &&
-          (void 0 === e.displayTime ||
-            void 0 === t.displayTime ||
-            e.displayTime === t.displayTime) &&
-          e.inlineEditable === t.inlineEditable &&
-          e.text === t.text &&
-          e.showUser === t.showUser &&
-          e.userDisplayName === t.userDisplayName &&
-          e.time === t.time &&
-          e.timeRange === t.timeRange &&
-          e.editable === t.editable &&
-          e.deletable === t.deletable
-        );
-      }),
-      (p.selected = function (o) {
-        if (void 0 === o) return e.hasClass("selected");
-        e.toggleClass("selected", o),
-          o
-            ? t.delay(d.FadeInterval).fadeIn(d.FadeInterval, function () {
-                var e;
-                n.resize(),
-                  null === (e = p.onSelectChangeRendered) ||
-                    void 0 === e ||
-                    e.call(p, { selected: !0 });
-              })
-            : t.fadeOut(d.FadeInterval, function () {
-                var e;
-                return null === (e = p.onSelectChangeRendered) || void 0 === e
-                  ? void 0
-                  : e.call(p, { selected: !1 });
-              }),
-          A.selected(o);
-      }),
-      (p.headerId = function () {
-        return e.attr("id");
-      }),
-      (p.resize = function (e, n) {
-        (e === f && n === h) ||
-          ((f = e), (h = n), v.css("max-height", n + "px"), t.width(e));
-      }),
-      (p.position = function (e) {
-        var t;
-        r &&
-          (_.each(i, function (n) {
-            n.time <= e && (t = n);
-          }),
-          w.highlight(t));
-      }),
-      (p.render = function (e, t, o, r, s) {
-        if ((o || e.sort(T), r)) {
-          var l = (function (e) {
-            for (
-              var t = [], n = [], o = 0, a = 0;
-              o < i.length && a < e.length;
-
-            ) {
-              var r = i[o],
-                s = e[a],
-                l = T(r, s);
-              0 === l
-                ? (p.isSameEventRendering(r, s) || (t.push(s), n.push(r)),
-                  o++,
-                  a++)
-                : l < 0
-                ? (n.push(r), o++)
-                : (t.push(s), a++);
-            }
-            for (; o < i.length; ) n.push(i[o]), o++;
-            for (; a < e.length; ) t.push(e[a]), a++;
-            return { eventsToAdd: t, eventsToRemove: n };
-          })(e);
-          (e = l.eventsToAdd),
-            _.each(l.eventsToRemove, function (e) {
-              i.splice(i.indexOf(e), 1), y.find("#" + e.id).remove();
-            });
-        }
-        _.each(e, function (e) {
-          var t;
-          "number" != typeof e.time ||
-            e.displayTime ||
-            (e.displayTime = Panopto.Core.TimeHelpers.formatDuration(
-              e.time,
-              Panopto.GlobalResources.TimeSeparator
-            )),
-            !e.creationTime ||
-              (a !== PanoptoViewer.EventType.Comment &&
-                e.type !== PanoptoViewer.EventType.Comment &&
-                e.displayTime) ||
-              ((t = Panopto.Core.TimeHelpers.toLocalPanoptoTime(
-                Panopto.Core.TimeHelpers.formatWin32EpochTimeToDate(
-                  e.creationTime
-                ),
-                Panopto.timeZone
-              )),
-              (e.displayDate = Panopto.GlobalResources.ViewerPlus_CommentTimestamp.format(
-                Panopto.Core.TimeHelpers.utcDateToFormattedString(t, "LL"),
-                Panopto.Core.TimeHelpers.utcDateToFormattedString(t, "LT"),
-                e.userDisplayName
-              ))),
-            e.isQuestionList
-              ? (e.iconCode = Panopto.Core.Constants.QuestionListIconCode)
-              : e.url &&
-                -1 !==
-                  e.url.indexOf(PanoptoViewer.Constants.YouTubeEmbedBaseUrl) &&
-                (e.iconClass = PanoptoTS.Viewer.Constants.YouTubeIconClass),
-            n.isActiveBroadcast() && (e.createdDuringWebcast = !1);
-          var o = Panopto.Core.TextHelpers.cleanTextWithHighlighting(e.text);
-          E &&
-            (o = Panopto.Core.TextHelpers.urlsToLinks(o, { preserveHtml: !0 })),
-            (e.content = Panopto.Core.TextHelpers.displayLineBreaks(o));
-        });
-        var c = _.template(m.html());
-        !r && t
-          ? ((i.length = 0),
-            _.each(e, function (e) {
-              i.push(e);
-            }),
-            y.html(c({ events: e })),
-            _.each(i, function (e) {
-              p.afterRenderItem(e, y.find("#" + e.id), !1);
-            }))
-          : _.each(e, function (e) {
-              var t,
-                n,
-                o = c({ events: [e] }),
-                a = _.findIndex(i, function (t) {
-                  return t.eventId === e.eventId;
-                }),
-                r = !1;
-              if (a >= 0) {
-                r =
-                  (n = y.find("#" + e.id)).hasClass(
-                    Panopto.Core.Constants.HighlightedClass
-                  ) && !s;
-                var l = $.parseHTML($.trim(o));
-                n.replaceWith(l), (n = $(l)), (i[a] = e);
-              } else {
-                i.push(e), i.sort(T), (r = !s), (t = i.indexOf(e));
-                var d = $.parseHTML($.trim(o));
-                0 === t
-                  ? y.prepend(d)
-                  : t === i.length - 1
-                  ? y.append(d)
-                  : y.find("#" + i[t - 1].id).after(d),
-                  (n = $(d));
-              }
-              p.afterRenderItem(e, n, r);
-            });
-      }),
-      (p.afterRenderItem = function (e, t, n) {
-        e.displayTime && Panopto.Core.UI.Handlers.button(y.find("#" + e.id), b),
-          n && w.highlight(e),
-          t
-            .find("a")
-            .unbind("click keydown")
-            .click(function (e) {
-              e.stopPropagation();
-            })
-            .keydown(function (e) {
-              e.stopPropagation();
-            });
-      }),
-      (p.remove = function (e) {
-        _.each(e, function (e) {
-          var t = y.find("#" + e.id);
-          t.slideUp(void 0, function () {
-            t.remove();
-          }),
-            i.splice(i.indexOf(e), 1);
-        });
-      }),
-      (p.toggleLoading = function (e) {
-        P.toggle(e);
-      }),
-      (p.error = function (e, t) {
-        e
-          ? (g.find(".event-tab-error-message").text(e),
-            Panopto.Core.UI.Handlers.button(
-              g.find(".event-tab-error-retry"),
-              t
-            ),
-            Panopto.Core.UI.Handlers.button(
-              g.find(".event-tab-error-cancel"),
-              function () {
-                p.error(!1);
-              }
-            ),
-            g.slideDown())
-          : g.slideUp();
-      }),
-      (p.fetch = function (e, t, n, i, r) {
-        (i = i || a),
-          p.toggleLoading(!0),
-          c.search(
-            o,
-            i,
-            e,
-            t,
-            n,
-            l,
-            !r,
-            function (e) {
-              p.render(
-                _.map(e, function (e) {
-                  return new PanoptoTS.Viewer.Data.Event(e);
-                }),
-                !0,
-                void 0,
-                void 0,
-                void 0
-              ),
-                p.error(!1),
-                p.toggleLoading(!1);
-            },
-            function () {
-              p.fetchError(e, t, n, i);
-            }
-          );
-      }),
-      (p.fetchError = function (e, t, n, o) {
-        p.error(
-          Panopto.GlobalResources.ViewerPlus_EventTab_LoadError,
-          function () {
-            p.fetch(e, t, n, o);
-          }
-        ),
-          p.toggleLoading(!1);
-      }),
-      (p.events = function () {
-        return i;
-      }),
-      p
-    );
-  }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
-  (PanoptoLegacy.Viewer.Tabs.NotesTab = function (
-    e,
-    t,
-    n,
-    o,
-    i,
-    a,
-    r,
-    s,
-    l,
-    c,
-    d
-  ) {
-    var u,
-      p,
-      f,
-      h = Panopto.Viewer.Data,
-      m = PanoptoTS.Viewer.Constants,
-      v = !1,
-      y = PanoptoLegacy.Viewer.Tabs.EditableEventTab(
-        e,
-        t,
-        n,
-        o,
-        [],
-        PanoptoViewer.EventType.Note,
-        !0,
-        a,
-        Panopto.GlobalResources.ViewerPlus_AddNote,
-        Panopto.GlobalResources.ViewerPlus_AddNote_None,
-        Panopto.GlobalResources.ViewerPlus_Notes_SignIn,
-        Panopto.Viewer.Analytics.Labels.Note,
-        void 0,
-        l,
-        c,
-        d
-      ),
-      P = y,
-      g = Panopto.Core.Extensions.base(y),
-      S = [],
-      C = "public",
-      w = t.find("#channelSingleLabel"),
-      b = t.find("#channelSelect"),
-      T = t.find("#channelInput"),
-      A = t.find("#channelOptionTemplate"),
-      E = t.find("#togglePublic"),
-      V = t.find("#notesDownload"),
-      I = t.find("#cancelChannel"),
-      k = t.find(".event-input"),
-      R = function (e) {
-        b.val(e.value), b.change();
-      },
-      D = function (e) {
-        b.toggle(e),
-          E.toggle(s && e && r && u === p),
-          T.toggle(!e),
-          I.toggle(!e);
-      },
-      x = function (e) {
-        E.text(
-          e
-            ? Panopto.GlobalResources.ViewerPlus_MakePrivate
-            : Panopto.GlobalResources.ViewerPlus_MakePublic
-        ),
-          E.toggleClass(C, e);
-      },
-      L = function () {
-        y.toggleLoading(!0),
-          d.toggleEventPrivacy(
-            o,
-            !E.hasClass(C),
-            function (e) {
-              x(e.Public), y.error(!1), y.toggleLoading(!1);
-            },
-            function () {
-              var e = E.hasClass(C)
-                ? Panopto.GlobalResources.ViewerPlus_EventTab_TogglePrivateError
-                : Panopto.GlobalResources.ViewerPlus_EventTab_TogglePublicError;
-              y.error(e, function () {
-                L();
-              }),
-                y.toggleLoading(!1);
-            }
-          );
-      },
-      O = Panopto.GlobalResources.ViewerPlus_YourNotes.format(a.key);
-    if (
-      (w.text(O),
-      (p = h.Channel("", O)),
-      S.push(p),
-      r &&
-        _.each(r, function (e) {
-          e.value.toLowerCase() !== a.key && S.push(e);
-        }),
-      Panopto.viewer.isCustomNotesChannelEnabled &&
-        S.push(
-          h.Channel(
-            m.JoinChannelOptionValue,
-            Panopto.GlobalResources.ViewerPlus_JoinChannel
-          )
-        ),
-      b.html(_.template(A.html())({ channels: S })),
-      (f = b.find("option[value='" + m.JoinChannelOptionValue + "']")),
-      b.change(function () {
-        var e = b.val();
-        e === m.JoinChannelOptionValue
-          ? (D(!1), T.focus())
-          : ((u = _.find(S, function (t) {
-              return t.value === e;
-            })),
-            v && y.fetch(),
-            V.attr("href", M()),
-            E.toggle(s && r && e === p.value));
-      }),
-      b.keydown(function (e) {
-        return e.stopPropagation();
-      }),
-      w.toggle(1 === S.length),
-      b.toggle(S.length > 1),
-      r)
-    ) {
-      Panopto.Core.UI.Handlers.button(E, L);
-      var U = _.find(r, function (e) {
-        return e.name.toLowerCase() === a.key;
-      });
-      x(void 0 !== U), E.toggle(s);
-    }
-    T.keydown(function (e) {
-      var t,
-        n,
-        o = jQuery.trim(T.val());
-      13 === e.keyCode &&
-        (e.preventDefault(),
-        o &&
-          o !== m.JoinChannelOptionValue &&
-          ((t = _.find(S, function (e) {
-            return e.value === o;
-          })) ||
-            ((n = h.Channel(o)),
-            f.before(_.template(A.html())({ channels: [n] })),
-            S.splice(S.length - 2, 0, n),
-            T.val(""),
-            (t = n)),
-          D(!0),
-          R(t))),
-        e.stopPropagation();
-    }),
-      Panopto.Core.UI.Handlers.button(I, function () {
-        T.val(""), R(u), D(!0);
-      }),
-      (y.render = function (e, t) {
-        v && a.key && k.show(),
-          _.each(e, function (e) {
-            e.showUser = e.user !== a.key;
-          }),
-          g.render(e, t);
-      }),
-      (y.fetch = function () {
-        u === p
-          ? g.fetch()
-          : u.isUser
-          ? g.fetch("", u.value)
-          : g.fetch("", "", u.value);
-      });
-    var M = function () {
-      var e, t;
-      u === p || (u.isUser ? (e = u.value) : (t = u.value));
-      var n = { id: o, tid: i, notesUser: e, channelName: t };
-      return Panopto.Core.StringHelpers.addQueryParameter(
-        Panopto.uriScheme +
-          "://" +
-          Panopto.webServerFQDN +
-          Panopto.appRoot +
-          "/Handlers/NotesDownload.ashx",
-        n
-      );
-    };
-    return (
-      (P.submitEvent = function () {
-        var e = b.val();
-        e === m.JoinChannelOptionValue && (e = jQuery.trim(T.val())),
-          e ? g.submitEvent(e) : g.submitEvent(u.value);
-      }),
-      (y.selected = function (e) {
-        return (
-          void 0 !== e && e && !v && (k.hide(), y.fetch(), (v = !0)),
-          g.selected(e)
-        );
-      }),
-      R(S[0]),
-      P
-    );
-  }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (Panopto.Viewer.Tabs.PlayerTabHeader = function (e, t, n, o, i) {
-    var a,
-      r,
-      s = e.find(".player-seek-text"),
-      l = !1;
-    return (
-      e.addClass(
-        o
-          ? PanoptoTS.Viewer.Constants.PrimaryTabHeaderClass
-          : PanoptoTS.Viewer.Constants.SecondaryTabHeaderClass
-      ),
-      i && e.find(".player-tab-wrapper > i").html(i),
-      Panopto.Core.UI.Handlers.hoverableParent(e, s, function (t) {
-        e.hasClass(Panopto.Core.Constants.InactiveClass) &&
-        !e.hasClass(Panopto.Core.Constants.DisabledClass) &&
-        t
-          ? (s.show(),
-            Panopto.viewer.allowMultipleSecondaryDisplay ||
-              s.css(
-                "left",
-                (e.filter(":visible").width() -
-                  s.filter(":visible").outerWidth()) /
-                  2
-              ))
-          : s.hide();
-      }),
-      {
-        available: function (t) {
-          var o = PanoptoTS.Viewer.Logic.TimelineLogic.isOnTimeline(n, t);
-          e.toggleClass(Panopto.Core.Constants.InactiveClass, !o),
-            !o && r && e.blur(),
-            (r = o);
-          var i = _.find(n, function (e) {
-            return e > t;
-          });
-          return (
-            (a = o ? void 0 : i || n[0]),
-            s.text(
-              Panopto.GlobalResources.ViewerPlus_SecondarySeekText.format(
-                Panopto.Core.TimeHelpers.formatDuration(
-                  i || n[0],
-                  Panopto.GlobalResources.TimeSeparator
-                )
-              )
-            ),
-            o
-          );
-        },
-        selected: function (t) {
-          if (void 0 === t) return l;
-          e.toggleClass(Panopto.Core.Constants.SelectedClass, t),
-            t && !l && s.hide(),
-            e.attr("aria-pressed", t),
-            (l = t);
-        },
-        owns: function (t) {
-          return (
-            1 ===
-            e.filter(function () {
-              return this === t;
-            }).length
-          );
-        },
-        id: function () {
-          return t;
-        },
-        seekTime: function () {
-          return a;
-        },
-        timeline: function (e) {
-          n = e;
-        },
-      }
-    );
-  }),
-  ((Panopto = Panopto || {}).UI = Panopto.UI || {}),
-  (Panopto.UI.Input = Panopto.UI.Input || {}),
-  (Panopto.Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
-  (PanoptoLegacy.Viewer.Tabs.SearchTab = function (e, t, n, o, i, a, r) {
-    var s,
-      l = PanoptoTS.Viewer.Constants,
-      c = [],
-      d = PanoptoLegacy.Viewer.Tabs.ViewerEventTab(
-        e,
-        t,
-        n,
-        o,
-        c,
-        PanoptoViewer.EventType.None,
-        !1,
-        Panopto.Viewer.Analytics.Labels.Search,
-        a,
-        r
-      ),
-      u = d,
-      p = Panopto.Core.Extensions.base(d),
-      f = "searchable",
-      h = $("#searchRegion"),
-      m = h.find("#searchInput"),
-      v = h.find("#searchButton"),
-      y = h.find("#clearButton"),
-      P = t.find("#searchTypeSelect"),
-      g = t.find("#searchSortSelect");
-    h.toggle(!0), d.toggleHeader(!1);
-    var S = [
-      { value: "", name: Panopto.GlobalResources.ViewerPlus_Search_All },
-    ];
-    return (
-      PanoptoCore.forEachEnum(PanoptoViewer.EventType, function (e, t) {
-        S.push({
-          value: t,
-          name: Panopto.GlobalResources[l.SearchTypeResourceString.format(e)],
-        });
-      }),
-      P.html(
-        _.template($("#searchOptionTemplate").html())({ searchOptions: S })
-      ),
-      g.html(
-        _.template($("#searchOptionTemplate").html())({
-          searchOptions: l.SearchSortOrders,
-        })
-      ),
-      m.keydown(function (e) {
-        e.keyCode === Panopto.Core.Key.Enter && d.fetch(), e.stopPropagation();
-      }),
-      m.keyup(function () {
-        h.toggleClass(f, "" !== jQuery.trim(m.val()));
-      }),
-      m.focus(function () {
-        h.toggleClass(f, "" !== jQuery.trim(m.val())), n.fireFocused();
-      }),
-      (u.setQueryText = function (e) {
-        m.val(e);
-      }),
-      P.change(function () {
-        d.fetch();
-      }),
-      P.keydown(function (e) {
-        return e.stopPropagation();
-      }),
-      g.change(function () {
-        var e = [];
-        _.each(c, function (t) {
-          e.push(t);
-        }),
-          g.val() === l.SortTimeValue
-            ? d.render(e, void 0, void 0, void 0, void 0)
-            : d.fetch();
-      }),
-      g.keydown(function (e) {
-        return e.stopPropagation();
-      }),
-      Panopto.Core.UI.Handlers.button(v, function () {
-        d.fetch();
-      }),
-      Panopto.Core.UI.Handlers.button(y, function () {
-        m.val(""), h.removeClass(f), m.focus(), d.fetch();
-      }),
-      m.attr("placeholder", Panopto.GlobalResources.ViewerPlus_SearchHeader),
-      (d.selected = function (e) {
-        if (void 0 === e) return p.selected();
-        p.selected(e), h.toggleClass(Panopto.Core.Constants.SelectedClass, e);
-      }),
-      (d.render = function (e) {
-        var n;
-        _.each(e, function (e) {
-          (e.iconClass = e.type),
-            e.type === PanoptoViewer.EventType.Note &&
-              ((i && i.key === e.user) || (e.showUser = !0));
-        }),
-          p.render(e, !0, g.val() === l.SortRelevanceValue),
-          (n = !!e.length) ||
-            t
-              .find("#searchResultsMessage")
-              .html(
-                PanoptoTS.StringHelpers.format(
-                  Panopto.GlobalResources.ViewerPlus_Search_NoResults,
-                  PanoptoTS.StringHelpers.format(
-                    "<span class='match'>{0}</span>",
-                    Panopto.Core.TextHelpers.cleanTextWithHighlighting(s)
-                  )
-                )
-              ),
-          t.find("#searchResultsMessage").toggle(!n);
-      }),
-      (d.fetch = function () {
-        (s = jQuery.trim(m.val())),
-          h.toggleClass("search-active", !!s),
-          d.toggleHeader(!!s),
-          n.fireSearchStarted(s),
-          p.fetch(s, "", "", P.val());
-      }),
-      u
-    );
-  }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
-  (Panopto.Viewer.Tabs.SecondaryTab = function (e, t, n, o) {
-    var i,
-      a,
-      r = Panopto.Viewer.Analytics,
-      s = PanoptoTS.Viewer.Constants,
-      l = $(),
-      c = !0,
-      d = function (e) {
-        if (void 0 === e) return c;
-        (c = e),
-          i.toggleClass(Panopto.Core.Constants.DisabledClass, !c),
-          l.attr("aria-disabled", String(!c));
-      },
-      u = function (i, s) {
-        if (void 0 === i) return a.selected();
-        if ((t.toggle(i), i && !a.selected())) {
-          if (
-            Panopto.viewer.showBrandWhilePlaying &&
-            0 === e.getContent().find(".logo-while-playing").length
-          ) {
-            var c = new PanoptoViewer.WatermarkLogo(
-              !0,
-              Panopto.branding.embedLogo.png
-            );
-            e.getContent().append(c.getBrandElem());
-          }
-          e.setContentClass(n.tabClass),
-            t.setContent(n, !1, null),
-            e.setSelectedText(n.title),
-            e.setSelectedIcon(o, n.iconClass),
-            s &&
-              r.sendEvent({
-                action: r.Actions.SecondaryTab,
-                label: n.tabClass,
-              });
-        }
-        a.selected(i), l.attr("aria-checked", String(!!i));
-      },
-      p = function (e, n, o, i) {
-        var a = t;
-        return a.setSecondaryPosition
-          ? a.setSecondaryPosition(e, n, o, i)
-          : t.setPosition(e, i);
-      },
-      f = function (e) {
-        (n = e),
-          a.timeline(e.timeline),
-          a.selected() && t.setContent(e, !1, null);
-      };
-    return {
-      getPlayer: function () {
-        return t;
-      },
-      render: function () {
-        if (n.hiddenTab) i = $();
-        else {
-          var t = _.template($("#playerTabHeaderTemplate").html().trim()),
-            r = $(t({ content: n, type: "inline", tabindex: 0 })),
-            s = $(t({ content: n, type: "flyout", tabindex: 0 }));
-          (l = r.add(s))
-            .attr("role", "menuitemradio")
-            .attr("aria-checked", "false")
-            .attr("aria-label", _.escape(n.title)),
-            e.addTab(r[0], s[0]),
-            (i = r.add(s));
-        }
-        a = Panopto.Viewer.Tabs.PlayerTabHeader(i, n.id, n.timeline, !1, o);
-      },
-      remove: function () {
-        t.remove(), i.remove();
-      },
-      position: p,
-      setPosition: p,
-      playState: function (e) {
-        t.playState(e);
-      },
-      bitrate: function (e) {
-        t.bitrate(e);
-      },
-      numericBitrate: function () {
-        return t.numericBitrate();
-      },
-      hasMBR: function () {
-        return t.hasMBR();
-      },
-      bitrateLevelOffset: function () {
-        return t.bitrateLevelOffset();
-      },
-      playSpeed: function (e) {
-        t.playSpeed(e);
-      },
-      content: function (e) {
-        if (void 0 === e) return n;
-        f(e);
-      },
-      setContent: f,
-      resize: function (e, n) {
-        t.resize(e, n);
-      },
-      available: function (e) {
-        return a.available(e);
-      },
-      timeline: function () {
-        return n.timeline;
-      },
-      relativeStartTime: function () {
-        return n.relativeStartTime;
-      },
-      absoluteStartTime: function () {
-        return n.absoluteStartTime;
-      },
-      selected: u,
-      setSelected: u,
-      id: function () {
-        return a.id();
-      },
-      owns: function (e) {
-        return a.owns(e);
-      },
-      seekTime: function () {
-        return a.seekTime();
-      },
-      pauseWhenAvailable: function () {
-        return n.pauseWhenAvailable;
-      },
-      isSessionPlaybackBlocking: function () {
-        return n.isSessionPlaybackBlocking;
-      },
-      hiddenTab: function () {
-        return n.hiddenTab;
-      },
-      adjustTimeline: function (e) {
-        var t = e - (s.TimedSyncRate / 1e3) * 1.5;
-        n.pauseWhenAvailable && n.timeline[0] > t && (n.timeline[0] = t);
-      },
-      enabled: d,
-      setEnabled: d,
-    };
-  }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
-  (Panopto.Viewer.Tabs.TranscriptTab = function (e, t, n, o, i, a, r) {
-    var s = t.find("#languageSelect"),
-      l = _.template(t.find("#transcriptOptionTemplate").html()),
-      c = a.map(function (e) {
-        return {
-          code: e,
-          name:
-            PanoptoCore.ContentLanguageFriendly[
-              PanoptoCore.ContentLanguage[e]
-            ] || Panopto.GlobalResources.Admin_Captions_NoLanguage,
-        };
-      });
-    s.html(l({ languageList: c })), a.length <= 1 && s.hide();
-    var d = PanoptoLegacy.Viewer.Tabs.ViewerEventTab(
-      e,
-      t,
-      n,
-      o.id,
-      [],
-      PanoptoViewer.EventType.Transcript,
-      !0,
-      Panopto.Viewer.Analytics.Labels.Transcript,
-      i,
-      r
-    );
-    return (
-      s.change(function () {
-        d.fetch();
-      }),
-      (d.fetch = function () {
-        d.toggleLoading(!0),
-          r.getCaptions(
-            o.id,
-            i,
-            s.val(),
-            function (e) {
-              (o.captions = _.map(e, function (e) {
-                return new PanoptoTS.Viewer.Data.Event(e);
-              })),
-                d.render(o.captions, !0, void 0, void 0, void 0),
-                d.error(!1),
-                d.toggleLoading(!1);
-            },
-            function () {
-              d.fetchError(void 0, void 0, void 0, void 0), d.toggleLoading(!1);
-            }
-          );
-      }),
-      d.fetch(),
-      d
-    );
-  }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
-  (PanoptoLegacy.Viewer.Tabs.ViewerEventTab = function (
-    e,
-    t,
-    n,
-    o,
-    i,
-    a,
-    r,
-    s,
-    l,
-    c
-  ) {
-    var d = PanoptoLegacy.Viewer.Tabs.EventTab(e, t, n, o, i, a, r, s, l, c),
-      u = Panopto.Core.Extensions.base(d);
-    return (
-      (d.render = function (e, t, n, o, i) {
-        (e = _.filter(e, function (e) {
-          return !!jQuery.trim(e.text);
-        })),
-          u.render(e, t, n, o, i);
-      }),
-      d
-    );
-  }),
-  (function (e) {
-    !(function (e) {
-      !(function (e) {
-        var t = (function () {
-          function e() {}
-          return (
-            (e.create = function (e, t, n, o) {
-              return {
-                userSeekEnabled: e.userSeekEnabled,
-                setPosition: e.setPosition,
-                resize: function () {
-                  e.resize && e.resize();
-                },
-                isActiveBroadcast: e.isActiveBroadcast,
-                fireFocused: t,
-                isLive: e.isLive,
-                position: e.position,
-                getPosition: e.getPosition,
-                activePrimary: e.activePrimary,
-                activeSecondary: e.activeSecondary,
-                hotkey: e.hotkey,
-                toggleScreens: e.toggleScreens,
-                setSecondaryCount: e.setSecondaryCount,
-                reinitializeDelivery: e.reinitializeDelivery,
-                synchronize: e.synchronize,
-                viewMode: function (t) {
-                  var n;
-                  return e.viewMode && (n = e.viewMode(t)), n;
-                },
-                fireTabSelected: n,
-                fireSearchStarted: o,
-              };
-            }),
-            e
-          );
-        })();
-        e.ViewerEventTabHelpers = t;
-      })(e.Tabs || (e.Tabs = {}));
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {})),
   (function (e) {
     !(function (e) {
       !(function (e) {
@@ -11701,6 +10042,2386 @@ __extends =
         })();
         t.ViewerEventTabLogic = n;
       })(t.Logic || (t.Logic = {}));
+    })(e.Viewer || (e.Viewer = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Hive = (function (e) {
+    var t = PanoptoCore.Logging.Logger,
+      n = function (e) {
+        return (
+          Panopto.viewer.isHiveEnabled &&
+          e &&
+          !Panopto.viewer.isKollectiveEnabled &&
+          !Panopto.Core.Browser.isWin7IE11 &&
+          "undefined" != typeof hive
+        );
+      },
+      o = function (e, n) {
+        return {
+          onError: function (o) {
+            var i,
+              a = n.hiveTechOrder.indexOf(e);
+            return (
+              -1 !== a &&
+                ((i =
+                  a < n.hiveTechOrder.length
+                    ? PanoptoTS.StringHelpers.format(
+                        "{0} failed with message: {1}. Falling through to next tech {2} ",
+                        e,
+                        o.message,
+                        n.hiveTechOrder[a + 1]
+                      )
+                    : PanoptoTS.StringHelpers.format(
+                        "{0} failed with message: {1}. End of tech stack falling back to source",
+                        e,
+                        o.message
+                      )),
+                t.warning(i)),
+              !0
+            );
+          },
+          onActiveSession: function (n) {
+            t.info(
+              PanoptoTS.StringHelpers.format(
+                "Session activated with tech {0}, sessionDetails:",
+                e
+              ) + n
+            );
+          },
+        };
+      };
+    return (
+      (e.isHiveOptimized = n),
+      (e.createFlowplayerPlugin = function (e, t) {
+        var i = {};
+        if (n(e.optimizationToken)) {
+          var a = {};
+          a.hiveTechOrder = Panopto.viewer.hiveFlowplayerPluginTechOrder
+            .split(",")
+            .map(function (e) {
+              return e.trim();
+            });
+          var r = a.hiveTechOrder.indexOf("HiveJava");
+          t || -1 === r || a.hiveTechOrder.splice(r, 1),
+            (a.HiveJava = o("HiveJava", a)),
+            (a.HiveJS = o("HiveJS", a)),
+            (a.StatsJS = o("StatsJS", a)),
+            (i = {
+              sources: [
+                { type: "application/x-mpegurl", ticket: e.optimizationToken },
+              ],
+              options: a,
+            });
+        }
+        return i;
+      }),
+      (e.attachFlowplayerHlsJsConfig = function (e, t) {
+        n(e.optimizationToken) && (t.xhrSetup || (t.xhrSetup = function () {}));
+      }),
+      (e.getHiveSourceForReload = function (e, t) {
+        return (
+          e.off("stop.hiveStop"),
+          e.off("finish.hiveFinish"),
+          [{ type: "application/x-mpegurl", ticket: t.optimizationToken }]
+        );
+      }),
+      (e.loadHiveTicket = function (e, n, o, i, a) {
+        e.closeHiveSession(),
+          e.load(n, o, function (e) {
+            t.info(
+              PanoptoTS.StringHelpers.format(
+                "Hive to load ticket: {0} reasons: ",
+                n[0].ticket
+              ) + e
+            ),
+              t.info(
+                PanoptoTS.StringHelpers.format(
+                  "Falling back to source {0}",
+                  i.clip.sources[0].src
+                )
+              ),
+              a(i, o);
+          });
+      }),
+      (e.addCloseHiveSessionToStopAndFinish = function (e) {
+        e.one("stop.hiveStop", function () {
+          e.off("finish.hiveFinish"), e.closeHiveSession();
+        }),
+          e.one("finish.hiveFinish", function () {
+            e.off("stop.hiveStop"), e.closeHiveSession();
+          });
+      }),
+      e
+    );
+  })(Panopto.Viewer.Hive || {})),
+  (function (e) {
+    !(function (e) {
+      !(function (e) {
+        var t = (function () {
+          function e() {}
+          return (
+            (e.toLogLine = function (e, t, n, o, i) {
+              return (
+                e +
+                "\t" +
+                t +
+                "\t" +
+                n +
+                "\t" +
+                o +
+                (void 0 !== i ? "\t" + i : "")
+              );
+            }),
+            (e.fromLogLine = function (e) {
+              var t = e.split("\t");
+              return {
+                source: t[0].toLowerCase(),
+                time: parseInt(t[1]),
+                playerName: t[2],
+                type: t[3].toLowerCase(),
+                value: t[4],
+              };
+            }),
+            e
+          );
+        })();
+        (e.PlayerScriptEvent = t),
+          (function (e) {
+            (e[(e.LogInput = "loginput")] = "LogInput"),
+              (e[(e.LogOutput = "logoutput")] = "LogOutput"),
+              (e[(e.LogDefer = "logdefer")] = "LogDefer"),
+              (e[(e.None = "none")] = "None"),
+              (e[(e.LogInputAndOutput = "loginputandoutput")] =
+                "LogInputAndOutput");
+          })(e.ViewerEventSource || (e.ViewerEventSource = {})),
+          (function (e) {
+            (e[(e.Load = "load")] = "Load"),
+              (e[(e.Play = "play")] = "Play"),
+              (e[(e.Pause = "pause")] = "Pause"),
+              (e[(e.Stop = "stop")] = "Stop"),
+              (e[(e.Seek = "seek")] = "Seek"),
+              (e[(e.Speed = "speed")] = "Speed"),
+              (e[(e.Bitrate = "bitrate")] = "Bitrate"),
+              (e[(e.Fullscreen = "fullscreen")] = "Fullscreen"),
+              (e[(e.Volume = "volume")] = "Volume"),
+              (e[(e.Mute = "mute")] = "Mute");
+          })(e.ViewerEventType || (e.ViewerEventType = {}));
+      })(e.Test || (e.Test = {}));
+    })(e.Viewer || (e.Viewer = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  (function (e) {
+    !(function (t) {
+      !(function (t) {
+        var n = (function () {
+          function e(e) {
+            (this.script = this.parseScriptBlob(e)),
+              (this.playerNames = _.uniq(_.pluck(this.script, "playerName")));
+          }
+          return (
+            (e.prototype.getPlayerNames = function () {
+              return this.playerNames;
+            }),
+            (e.prototype.start = function (e, t, n, i, a) {
+              var r = {};
+              _.each(t, function (e) {
+                var t = $.parseHTML("<div />");
+                i.append(t), (r[e] = new o(e, $(t), n));
+              }),
+                this.beginScript(e, r, a);
+            }),
+            (e.prototype.beginScript = function (e, t, n) {
+              var o,
+                i,
+                a = this,
+                r = -1,
+                s = function () {
+                  do {
+                    r++;
+                  } while (
+                    r < a.script.length &&
+                    (!t[a.script[r].playerName] || a.script[r].source !== e)
+                  );
+                  r < a.script.length ? l() : n && n();
+                },
+                l = function () {
+                  var e,
+                    n = a.script[r];
+                  o
+                    ? (e = n.time - o - (new Date().getTime() - i))
+                    : ((i = new Date().getTime()), (o = n.time), (e = 0)),
+                    e > 30
+                      ? setTimeout(l, e - 30)
+                      : e > 4
+                      ? setTimeout(l)
+                      : (t[n.playerName].runEvent(n, o - i), s());
+                };
+              s();
+            }),
+            (e.prototype.parseScriptBlob = function (e) {
+              return _.map(e.split("\n"), function (e) {
+                return t.PlayerScriptEvent.fromLogLine(e);
+              });
+            }),
+            e
+          );
+        })();
+        t.ScriptedViewer = n;
+        var o = (function () {
+            function n(t, n, o) {
+              if ("flowplayer" === o.toLowerCase()) this.playerStub = new i(n);
+              else if ("video" === o.toLowerCase()) this.playerStub = new a(n);
+              else {
+                if ("panoptoflowplayer" != o.toLowerCase())
+                  throw "Unknown player stub " + o;
+                this.playerStub = new r(
+                  new e.Viewer.Players.FlowplayerMachine(
+                    "primary" == t.toLowerCase(),
+                    n,
+                    { resize: $.noop, togglePlaying: $.noop }
+                  )
+                );
+              }
+              this.playerName = t;
+            }
+            return (
+              (n.prototype.runEvent = function (e, n) {
+                switch (
+                  (t.PlayerScriptEvent.toLogLine(
+                    e.source,
+                    n + new Date().getTime(),
+                    e.playerName,
+                    e.type,
+                    e.value
+                  ),
+                  e.type)
+                ) {
+                  case t.ViewerEventType.Load:
+                    this.playerStub.load(e.value);
+                    break;
+                  case t.ViewerEventType.Play:
+                    this.playerStub.play();
+                    break;
+                  case t.ViewerEventType.Pause:
+                    this.playerStub.pause();
+                    break;
+                  case t.ViewerEventType.Stop:
+                    this.playerStub.stop();
+                    break;
+                  case t.ViewerEventType.Seek:
+                    this.playerStub.seek(parseFloat(e.value) || 0);
+                    break;
+                  case t.ViewerEventType.Speed:
+                    this.playerStub.speed(parseFloat(e.value) || 0);
+                    break;
+                  case t.ViewerEventType.Bitrate:
+                    this.playerStub.bitrate(parseFloat(e.value) || 0);
+                    break;
+                  case t.ViewerEventType.Fullscreen:
+                    this.playerStub.fullscreen("true" == e.value.toLowerCase());
+                    break;
+                  case t.ViewerEventType.Volume:
+                    this.playerStub.volume(parseFloat(e.value));
+                    break;
+                  case t.ViewerEventType.Mute:
+                    this.playerStub.mute("true" == e.value.toLowerCase());
+                }
+              }),
+              n
+            );
+          })(),
+          i = (function () {
+            function e(e) {
+              (this.$element = e), this.ensureInitialized();
+            }
+            return (
+              (e.prototype.load = function (t) {
+                var n = {
+                  sources: [
+                    {
+                      src: t,
+                      type:
+                        -1 !== t.indexOf(".m3u8")
+                          ? e.HLSMimeType
+                          : e.MP4MimeType,
+                    },
+                  ],
+                };
+                this.api
+                  ? this.api.load(n)
+                  : (this.api = flowplayer(this.$element, { clip: n }));
+              }),
+              (e.prototype.play = function () {
+                this.api.resume();
+              }),
+              (e.prototype.pause = function () {
+                this.api.pause();
+              }),
+              (e.prototype.stop = function () {
+                this.api.stop();
+              }),
+              (e.prototype.seek = function (e) {
+                this.api.seek(e || 0);
+              }),
+              (e.prototype.speed = function (e) {
+                this.api.speed(e);
+              }),
+              (e.prototype.bitrate = function (e) {}),
+              (e.prototype.fullscreen = function (e) {
+                e != this.api.isFullscreen && this.api.fullscreen();
+              }),
+              (e.prototype.volume = function (e) {
+                this.api.volume(e / 100);
+              }),
+              (e.prototype.mute = function () {
+                this.api.mute(!0);
+              }),
+              (e.prototype.ensureInitialized = function () {
+                flowplayer.conf.hlsjs ||
+                  (flowplayer.conf.hlsjs = { startLevel: "auto", safari: !0 });
+              }),
+              (e.MP4MimeType = "video/mp4"),
+              (e.HLSMimeType = "application/x-mpegURL"),
+              e
+            );
+          })(),
+          a = (function () {
+            function e(e) {
+              (this.video = $.parseHTML("<video />")[0]),
+                e.append(this.video),
+                (this.hls = new Hls()),
+                this.hls.attachMedia(this.video);
+            }
+            return (
+              (e.prototype.load = function (e) {
+                e.indexOf(".m3u8")
+                  ? this.hls.loadSource(e)
+                  : (this.video.src = e);
+              }),
+              (e.prototype.play = function () {
+                this.video.play();
+              }),
+              (e.prototype.pause = function () {
+                this.video.pause();
+              }),
+              (e.prototype.stop = function () {
+                this.hls.stopLoad();
+              }),
+              (e.prototype.seek = function (e) {
+                this.video.currentTime = e;
+              }),
+              (e.prototype.speed = function (e) {
+                this.video.playbackRate = e;
+              }),
+              (e.prototype.bitrate = function (e) {}),
+              (e.prototype.fullscreen = function (e) {
+                e
+                  ? this.video.requestFullscreen()
+                  : this.video.stopFullscreen();
+              }),
+              (e.prototype.volume = function (e) {
+                this.video.volume = e / 100;
+              }),
+              (e.prototype.mute = function () {
+                this.video.muted = !0;
+              }),
+              e
+            );
+          })(),
+          r = (function () {
+            function e(e) {
+              this.panoptoPlayer = e;
+            }
+            return (
+              (e.prototype.load = function (e) {
+                this.panoptoPlayer.content({
+                  url: e,
+                  isBroadcast: !1,
+                  isAudioOnly: !1,
+                });
+              }),
+              (e.prototype.play = function () {
+                this.panoptoPlayer.playState(1);
+              }),
+              (e.prototype.pause = function () {
+                this.panoptoPlayer.playState(2);
+              }),
+              (e.prototype.stop = function () {
+                this.panoptoPlayer.playState(3);
+              }),
+              (e.prototype.seek = function (e) {
+                this.panoptoPlayer.position(e);
+              }),
+              (e.prototype.speed = function (e) {
+                this.panoptoPlayer.playSpeed(e);
+              }),
+              (e.prototype.bitrate = function (e) {
+                this.panoptoPlayer.bitrate(e);
+              }),
+              (e.prototype.fullscreen = function (e) {
+                this.panoptoPlayer.isFullscreen(e);
+              }),
+              (e.prototype.volume = function (e) {
+                this.panoptoPlayer.volume(e);
+              }),
+              (e.prototype.mute = function (e) {
+                this.panoptoPlayer.muted(e);
+              }),
+              e
+            );
+          })();
+      })(t.Test || (t.Test = {}));
+    })(e.Viewer || (e.Viewer = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  (function (e) {
+    !(function (e) {
+      !(function (e) {
+        var t = PanoptoCore.Logging.Logger,
+          n = (function () {
+            function t() {}
+            return (
+              (t.createLogger = function (n) {
+                if (!t.source) {
+                  var a = Panopto.Core.StringHelpers.parseQueryString(
+                    window.location.search.slice(1),
+                    !1,
+                    !0
+                  );
+                  t.source = a.scriptmode
+                    ? a.scriptmode.toString().toLowerCase()
+                    : e.ViewerEventSource.None;
+                }
+                return t.source !== e.ViewerEventSource.None
+                  ? new o(t.source, n)
+                  : new i();
+              }),
+              t
+            );
+          })();
+        e.ViewerScriptLoggerFactory = n;
+        var o = (function () {
+            function n(e, t) {
+              (this.scriptMode = e), (this.playerName = t);
+            }
+            return (
+              (n.prototype.log = function (n, o, i) {
+                (n !== this.scriptMode &&
+                  (this.scriptMode != e.ViewerEventSource.LogInputAndOutput ||
+                    (n != e.ViewerEventSource.LogInput &&
+                      n != e.ViewerEventSource.LogDefer &&
+                      n != e.ViewerEventSource.LogOutput))) ||
+                  t.info(
+                    e.PlayerScriptEvent.toLogLine(
+                      n,
+                      new Date().getTime(),
+                      this.playerName,
+                      o,
+                      i
+                    )
+                  );
+              }),
+              n
+            );
+          })(),
+          i = (function () {
+            function e() {}
+            return (e.prototype.log = function (e, t, n) {}), e;
+          })();
+      })(e.Test || (e.Test = {}));
+    })(e.Viewer || (e.Viewer = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (Panopto.Viewer.Tabs.AttachmentTab = function (e, t, n, o, i, a) {
+    var r = [],
+      s = _.template(
+        '\n        <a id="slidesDownload"\n            class="slide-download-link"\n            title="<@- fileName @>"\n            href="<@- slideDownloadHref @>"\n        >\n            <i class="material-icons md-24">file_download</i>\n            <span><@- fileName @></span>\n        </a>\n    '
+      ),
+      l = PanoptoLegacy.Viewer.Tabs.ViewerEventTab(
+        e,
+        t,
+        n,
+        o,
+        r,
+        PanoptoViewer.EventType.None,
+        !1,
+        Panopto.Viewer.Analytics.Labels.Attachment,
+        i,
+        a
+      );
+    l.render(r, !0, void 0, void 0, void 0);
+    var c, d, u;
+    return (
+      (c = t.find("#slideDownloadContainer")),
+      (d = function (e) {
+        var t = { id: o, tid: i, sdid: e };
+        return Panopto.Core.StringHelpers.addQueryParameter(
+          Panopto.uriScheme +
+            "://" +
+            Panopto.webServerFQDN +
+            Panopto.appRoot +
+            "/Handlers/SlideDeckDownload.ashx",
+          t
+        );
+      }),
+      (u = $.Deferred()),
+      Panopto.Core.ServiceInterface.Rest.Sessions.getAllSlideDecks(
+        o,
+        function (e) {
+          u.resolve(e);
+        },
+        function () {
+          u.reject();
+        }
+      ),
+      u.then(function (e) {
+        e.filter(function (e) {
+          return e.isDownloadAllowed;
+        }).forEach(function (e) {
+          return (
+            (t = e.id),
+            (n = e.name),
+            (o = $(s({ slideDownloadHref: d(t), fileName: n }))),
+            void c.append(o)
+          );
+          var t, n, o;
+        });
+      }),
+      l
+    );
+  }),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
+  (PanoptoLegacy.Viewer.Tabs.BookmarksTab = function (e, t, n, o, i, a, r) {
+    var s = !1,
+      l = PanoptoLegacy.Viewer.Tabs.EditableEventTab(
+        e,
+        t,
+        n,
+        o,
+        [],
+        PanoptoViewer.EventType.Bookmark,
+        !1,
+        i,
+        Panopto.GlobalResources.ViewerPlus_CreateBookmark,
+        Panopto.GlobalResources.ViewerPlus_CreateBookmark_None,
+        Panopto.GlobalResources.ViewerPlus_Bookmarks_SignIn,
+        Panopto.Viewer.Analytics.Labels.Bookmark,
+        void 0,
+        void 0,
+        a,
+        r
+      ),
+      c = Panopto.Core.Extensions.base(l),
+      d = t.find(".event-input");
+    return (
+      (l.selected = function (e) {
+        return (
+          void 0 !== e && e && !s && (d.hide(), l.fetch(), (s = !0)),
+          c.selected(e)
+        );
+      }),
+      (l.render = function (e, t, n, o, a) {
+        s && i.key && d.show(), c.render(e, t, n, o, a);
+      }),
+      l
+    );
+  }),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
+  (PanoptoLegacy.Viewer.Tabs.CommentsTab = function (
+    e,
+    t,
+    n,
+    o,
+    i,
+    a,
+    r,
+    s,
+    l,
+    c
+  ) {
+    var d,
+      u,
+      p = [],
+      f = t.find(".event-tab-list"),
+      h = Panopto.GlobalResources.ViewerPlus_AddComment,
+      m = PanoptoLegacy.Viewer.Tabs.EditableEventTab(
+        e,
+        t,
+        n,
+        o,
+        p,
+        PanoptoViewer.EventType.Comment,
+        !1,
+        a,
+        h,
+        h,
+        Panopto.GlobalResources.ViewerPlus_Comments_SignIn,
+        Panopto.Viewer.Analytics.Labels.Comment,
+        i,
+        void 0,
+        r,
+        c
+      ),
+      v = m,
+      y = Panopto.Core.Extensions.base(m),
+      P = t.find("#commentsListFooter"),
+      g = t.find("#commentsDownload"),
+      S = function () {
+        e.find(".text").text(
+          0 === p.length
+            ? Panopto.GlobalResources.ViewerPlus_CommentsHeader
+            : Panopto.GlobalResources.ViewerPlus_CommentHeader_Variable.format(
+                p.length
+              )
+        );
+      },
+      C = function () {
+        r &&
+          (clearInterval(u),
+          (u = setInterval(function () {
+            m.fetch(void 0, void 0, void 0, void 0, !0);
+          }, 1e3 * s)));
+      };
+    m.render = function (e, t) {
+      a.key
+        ? _.each(e, function (e) {
+            (e.editable = e.saved && e.user === a.key),
+              (e.deletable =
+                e.saved &&
+                (e.editable || a.role > Panopto.Data.AclRoleType.Viewer)),
+              (e.replyable = !0);
+          })
+        : _.each(e, function (e) {
+            e.replyable = !1;
+          }),
+        d
+          ? d.syncComments(e, t)
+          : (d = new PanoptoTS.Viewer.Tabs.Discussion.Discussion({
+              target: f,
+              events: e,
+              panoptoGlobal: Panopto,
+              eventClickedCallback: m.seekToEvent,
+              editClickedCallback: m.editEventClicked,
+              deleteClickedCallback: m.deleteEventClicked,
+              submitNewEventCallback: function (e, t) {
+                return m.saveNewEvent(e, t, void 0);
+              },
+            })).render(),
+        e && e.length > 0 && l
+          ? (P.show(), g.attr("href", w()), g.show())
+          : (P.hide(), g.hide()),
+        S();
+    };
+    var w = function () {
+      var e = { id: o, tid: i };
+      return Panopto.Core.StringHelpers.addQueryParameter(
+        Panopto.uriScheme +
+          "://" +
+          Panopto.webServerFQDN +
+          Panopto.appRoot +
+          "/Handlers/DiscussionDownload.ashx",
+        e
+      );
+    };
+    return (
+      (m.remove = function (e) {
+        _.each(e, function (e) {
+          p.splice(p.indexOf(e), 1), d.removeComment(e);
+        }),
+          m.updatePlaceholderText(),
+          S();
+      }),
+      (m.addEvent = function (e, t) {
+        var n = $(".reply-to-flag").data("replyToTime"),
+          o = n || t;
+        clearInterval(u), y.addEvent(e, o, void 0, C);
+      }),
+      (m.editEvent = function (e, t) {
+        clearInterval(u), y.editEvent(e, t, C);
+      }),
+      (m.deleteEvent = function (e) {
+        clearInterval(u), y.deleteEvent(e, C);
+      }),
+      (m.position = function (e) {
+        y.position(e),
+          r &&
+            n.isActiveBroadcast() &&
+            v.toggleBroadcastIsLiveOrEnded(n.isLive());
+      }),
+      (v.toggleBroadcastIsLiveOrEnded = function (e) {
+        m.isInputDisabled() && e
+          ? m.inputDisabled(!1)
+          : m.isInputDisabled() ||
+            e ||
+            m.inputDisabled(
+              Panopto.GlobalResources.ViewerPlus_Comments_SkipToLive
+            );
+      }),
+      (m.getEventTime = function () {
+        var e = $(".reply-to-flag").data("replyToTime");
+        return e || y.getEventTime();
+      }),
+      (m.focusEvent = function (e) {
+        d.scrollCommentIntoView(e), y.focusEvent(e);
+      }),
+      m.fetch(),
+      C(),
+      v
+    );
+  }),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
+  (PanoptoLegacy.Viewer.Tabs.ContentsTab = function (e, t, n, o, i, a) {
+    var r = PanoptoLegacy.Viewer.Tabs.ViewerEventTab(
+      e,
+      t,
+      n,
+      o,
+      [],
+      PanoptoViewer.EventType.Slide,
+      !0,
+      Panopto.Viewer.Analytics.Labels.Content,
+      void 0,
+      a
+    );
+    return r.render(i, !0, void 0, void 0, void 0), r;
+  }),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (PanoptoLegacy.Viewer.Tabs.DetailsTab = function (
+    e,
+    t,
+    n,
+    o,
+    i,
+    a,
+    r,
+    s,
+    l,
+    c,
+    d,
+    u,
+    p,
+    f
+  ) {
+    var h = Panopto.features.tagsEnabled
+        ? PanoptoTS.Viewer.Data.TagHelper.convertDeliveryToModel(r)
+        : [],
+      m =
+        !Panopto.Core.Browser.inIframe() || Panopto.viewer.linksEnabledInIframe,
+      v = Panopto.DetailsTab($("#detailsTab"), {
+        isVisible: !1,
+        sessionId: o,
+        name: i,
+        description: a,
+        tags: h,
+        ownerId: s,
+        ownerFullName: l,
+        ownerBio: c,
+        linkify: m,
+        tagsEnabled: Panopto.features.tagsEnabled,
+        tagService: u,
+        subscriptionsEnabled: Panopto.features.subscriptionsEnabled,
+        subscriptionService: p,
+        userService: f,
+        resources: Panopto.GlobalResources,
+      }),
+      y = PanoptoLegacy.Viewer.Tabs.EventTab(
+        e,
+        t,
+        n,
+        void 0,
+        [],
+        void 0,
+        !1,
+        void 0,
+        void 0,
+        d
+      );
+    return (
+      (y.onSelectChangeRendered = function (e) {
+        var t = e.selected;
+        return v.setProps({ isVisible: t });
+      }),
+      y
+    );
+  }),
+  ((Panopto = Panopto || {}).Core = Panopto.Core || {}),
+  (Panopto.Core.Key = Panopto.Core.Key || {}),
+  (Panopto.UI = Panopto.UI || {}),
+  (Panopto.UI.Input = Panopto.UI.Input || {}),
+  (Panopto.Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
+  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (PanoptoLegacy.Viewer.Tabs.EditableEventTab = function (
+    e,
+    t,
+    n,
+    o,
+    i,
+    a,
+    r,
+    s,
+    l,
+    c,
+    d,
+    u,
+    p,
+    f,
+    h,
+    m
+  ) {
+    var v,
+      y,
+      P = PanoptoTS.Viewer.Constants,
+      g = Panopto.Viewer.Analytics,
+      S = PanoptoLegacy.Viewer.Tabs.ViewerEventTab(
+        e,
+        t,
+        n,
+        o,
+        i,
+        a,
+        r,
+        u,
+        p,
+        m
+      ),
+      C = S,
+      w = Panopto.Core.Extensions.base(S);
+    t.append(_.template($("#eventTabInputTemplate").html())({}));
+    var b,
+      T = t.find(".event-input"),
+      A = t.find(".cancel-editing"),
+      E = "editing",
+      V = 0,
+      I = T.height();
+    C.updatePlaceholderText = function () {
+      T.attr("placeholder", b || (i.length ? l : c)), T.attr("aria-label", l);
+    };
+    var k = function (e) {
+        e
+          ? ((v = e),
+            t.find("#" + e.id).toggleClass(E, !0),
+            T.val(e.text).focus().select(),
+            D(void 0),
+            A.show(),
+            T.prop("disabled", !1).toggleClass(E, !0))
+          : (v &&
+              (t.find("#" + v.id).toggleClass(E, !1),
+              A.hide(),
+              T.toggleClass(E, !1)),
+            (v = void 0),
+            T.val(""),
+            D(I),
+            C.updatePlaceholderText(),
+            (y = void 0),
+            b && T.prop("disabled", !0));
+      },
+      R = function (e, n, o, i) {
+        var a = t.find("#" + e.id),
+          r = a.find(".event-error");
+        r.find(".event-error-message").text(n),
+          Panopto.Core.UI.Handlers.button(r.find(".event-error-retry"), o),
+          Panopto.Core.UI.Handlers.button(r.find(".event-error-cancel"), i),
+          a.toggleClass("errored", !0);
+      };
+    (C.wireUpEditMenu = function (e) {
+      var n = t.find("#" + e.id),
+        o = new PanoptoTS.Viewer.Controls.EditEventMenu(
+          n,
+          n.find(".event-edit-toggle"),
+          Panopto.GlobalResources,
+          { toggleAppearsOnHover: !0 }
+        );
+      o.editCallbacks.add(function (e) {
+        C.editEventClicked(e);
+      }),
+        o.deleteCallbacks.add(function (e) {
+          C.deleteEventClicked(e);
+        }),
+        o.setEvent(e, { canEdit: e.editable, canDelete: e.deletable });
+    }),
+      (C.editEventClicked = function (e) {
+        k(!1), k(e);
+      }),
+      (C.deleteEventClicked = function (e) {
+        (e.saved = !1),
+          S.render([e], !1, void 0, void 0, void 0),
+          C.deleteEvent(e);
+      });
+    var D = function (e) {
+      var t = T.innerHeight() - T.height();
+      T.height(1);
+      var n = T[0].scrollHeight,
+        o = e || n - t;
+      T.height(o);
+    };
+    if (s.key)
+      T.keyup(function () {
+        var e = jQuery.trim(T.val());
+        e && void 0 === y ? (y = C.getEventTime()) : e || (y = void 0);
+      }),
+        T.on("paste input", function () {
+          D(void 0);
+        }),
+        T.keydown(function (e) {
+          (e.ctrlKey && e.keyCode === Panopto.Core.Key.UpArrow) ||
+            (e.stopPropagation(),
+            e.keyCode !== Panopto.Core.Key.Enter || e.shiftKey
+              ? e.keyCode === Panopto.Core.Key.Esc && C.resetInput()
+              : (e.preventDefault(),
+                void 0 === y && T.keyup(),
+                C.submitEvent(void 0)));
+        }),
+        Panopto.Core.UI.Handlers.button(A, function () {
+          k(!1);
+        }),
+        l && C.updatePlaceholderText();
+    else {
+      T.hide();
+      var x = _.template($("#eventTabSignInTemplate").html());
+      t.find(".event-signin")
+        .html(
+          PanoptoTS.StringHelpers.format(
+            d,
+            x({
+              url: PanoptoTS.StringHelpers.format(
+                "{0}?ReturnUrl={1}",
+                Panopto.loginUrl,
+                encodeURIComponent(window.location.href)
+              ),
+              text: Panopto.GlobalResources.ViewerPlus_EventTab_SignIn,
+            })
+          )
+        )
+        .show();
+    }
+    return (
+      (S.resize = function (e, t) {
+        var n = T.is(":visible") ? T.outerHeight(!0) : 0;
+        A.is(":visible") && (n += A.outerHeight(!0)),
+          T.width(e - P.InputMargin),
+          w.resize(e, t - n);
+      }),
+      (S.render = function (e, t) {
+        s.key &&
+          _.each(e, function (e) {
+            (e.editable = e.saved && e.user === s.key),
+              (e.deletable =
+                e.saved &&
+                (e.editable || s.role > Panopto.Data.AclRoleType.Viewer));
+          }),
+          f &&
+            _.each(e, function (e) {
+              delete e.time;
+            }),
+          w.render(e, t),
+          _.each(e, function (e) {
+            (e.editable || e.deletable) && C.wireUpEditMenu(e);
+          }),
+          C.updatePlaceholderText(),
+          n.resize();
+      }),
+      (S.remove = function (e) {
+        w.remove(e), C.updatePlaceholderText();
+      }),
+      (C.addEvent = function (e, t, n, i) {
+        m.createEvent(
+          o,
+          a,
+          e.text,
+          t,
+          !f,
+          n,
+          h,
+          function (t) {
+            (e.eventId = t.EventID),
+              (e.eventPublicId = t.PublicId),
+              (e.sessionId = t.SessionId),
+              (e.saved = !0),
+              S.render([e], !1, void 0, void 0, void 0),
+              S.toggleLoading(!1),
+              g.sendEvent({ action: g.Actions.Add.Success, label: u }),
+              i && i();
+          },
+          function () {
+            R(
+              e,
+              Panopto.GlobalResources.ViewerPlus_EventTab_AddError,
+              function () {
+                C.addEvent(e, t, n, i),
+                  g.sendEvent({ action: g.Actions.Add.Retry, label: u });
+              },
+              function () {
+                S.remove([e]),
+                  g.sendEvent({ action: g.Actions.Add.Cancel, label: u });
+              }
+            ),
+              S.toggleLoading(!1),
+              g.sendEvent({ action: g.Actions.Add.Error, label: u }),
+              i && i();
+          }
+        );
+      }),
+      (C.editEvent = function (e, t, n) {
+        m.editEvent(
+          e.sessionId,
+          e.type || a,
+          e.eventPublicId,
+          e.text,
+          function () {
+            (e.saved = !0),
+              S.render([e], !1, void 0, void 0, void 0),
+              S.toggleLoading(!1),
+              g.sendEvent({ action: g.Actions.Edit.Success, label: u }),
+              n && n();
+          },
+          function () {
+            R(
+              e,
+              Panopto.GlobalResources.ViewerPlus_EventTab_EditError,
+              function () {
+                C.editEvent(e, t, n),
+                  g.sendEvent({ action: g.Actions.Edit.Retry, label: u });
+              },
+              function () {
+                (e.text = t),
+                  (e.saved = !0),
+                  S.render([e], !1, void 0, void 0, void 0),
+                  g.sendEvent({ action: g.Actions.Edit.Cancel, label: u });
+              }
+            ),
+              S.toggleLoading(!1),
+              g.sendEvent({ action: g.Actions.Edit.Error, label: u }),
+              n && n();
+          }
+        );
+      }),
+      (C.deleteEvent = function (e, t) {
+        S.toggleLoading(!0),
+          m.deleteEvent(
+            e.sessionId,
+            e.type || a,
+            e.eventPublicId,
+            function () {
+              e === v && k(!1),
+                S.remove([e]),
+                S.toggleLoading(!1),
+                g.sendEvent({ action: g.Actions.Delete.Success, label: u }),
+                t && t();
+            },
+            function () {
+              R(
+                e,
+                Panopto.GlobalResources.ViewerPlus_EventTab_DeleteError,
+                function () {
+                  C.deleteEvent(e, t),
+                    g.sendEvent({ action: g.Actions.Delete.Retry, label: u });
+                },
+                function () {
+                  (e.saved = !0),
+                    C.render([e], !1, void 0, void 0, void 0),
+                    g.sendEvent({ action: g.Actions.Delete.Cancel, label: u });
+                }
+              ),
+                S.toggleLoading(!1),
+                g.sendEvent({ action: g.Actions.Delete.Error, label: u }),
+                t && t();
+            }
+          );
+      }),
+      (C.submitEvent = function (e) {
+        var t,
+          n,
+          o = jQuery.trim(T.val());
+        o &&
+          (T.val(""),
+          D(I),
+          S.toggleLoading(!0),
+          v
+            ? ((t = v),
+              k(!1),
+              (n = t.text),
+              (t.text = o),
+              (t.saved = !1),
+              S.render([t], !1, void 0, void 0, void 0),
+              C.editEvent(t, n))
+            : C.saveNewEvent(o, y, e));
+      }),
+      (C.saveNewEvent = function (e, t, n) {
+        var o = f ? t - new Date().getTime() / 1e3 : t,
+          i = {
+            id: a + V.toString(),
+            text: e,
+            time: t,
+            creationTime: Panopto.Core.TimeHelpers.currentWin32EpochTime(),
+            user: s.key,
+            userDisplayName: Panopto.viewer.displayFullNamesInDiscussion
+              ? s.name
+              : s.key,
+          };
+        S.render([i], !1, void 0, void 0, void 0),
+          (y = void 0),
+          V++,
+          C.addEvent(i, o, n),
+          C.focusEvent(i);
+      }),
+      (C.inputDisabled = function (e) {
+        if (void 0 === e) return !!b;
+        v && k(!1),
+          (b = e),
+          T.prop("disabled", !!b).val(""),
+          C.updatePlaceholderText();
+      }),
+      (C.isInputDisabled = C.inputDisabled),
+      (C.getEventTime = function () {
+        return f ? new Date().getTime() / 1e3 : n.position();
+      }),
+      (C.resetInput = function () {
+        k(!1);
+      }),
+      (C.focusEvent = function (e) {}),
+      C
+    );
+  }),
+  ((Panopto = Panopto || {}).UI = Panopto.UI || {}),
+  (Panopto.UI.Components = Panopto.UI.Components || {}),
+  (Panopto.UI.Accessibility = Panopto.UI.Accessibility || {}),
+  (Panopto.Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
+  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (PanoptoLegacy.Viewer.Tabs.EventTab = function (
+    e,
+    t,
+    n,
+    o,
+    i,
+    a,
+    r,
+    s,
+    l,
+    c
+  ) {
+    var d = PanoptoTS.Viewer.Constants,
+      u = Panopto.Viewer.Analytics,
+      p = {};
+    t.prepend(_.template($("#eventTabErrorTemplate").html())({}));
+    var f,
+      h,
+      m = $("#eventTemplate"),
+      v = t.find(".event-tab-scroll-pane"),
+      y = t.find(".event-tab-list"),
+      P = t.find(".event-tab-spinner"),
+      g = t.find(".event-tab-error"),
+      S = t.find(".event-tab-help"),
+      C = !1,
+      w = Panopto.Core.UI.Components.scrollingHighlight(
+        v,
+        !0,
+        d.EventScrollTimeout
+      ),
+      b = function (e) {
+        w.highlight(
+          _.find(i, function (t) {
+            return t.id === e.id;
+          }),
+          function (e) {
+            p.seekToEvent(e);
+          }
+        );
+      };
+    p.seekToEvent = function (e) {
+      n.userSeekEnabled() &&
+        (n.setPosition(e.time),
+        u.sendEvent({ action: u.Actions.Navigate, label: s }));
+    };
+    var T = function (e, t) {
+        var n =
+          a === PanoptoViewer.EventType.Comment
+            ? e.creationTime - t.creationTime
+            : e.time - t.time;
+        return n || e.id === t.id || (n = e.id < t.id ? -1 : 1), n;
+      },
+      A = Panopto.Core.UI.Accessibility.tab(e, t),
+      E =
+        !Panopto.Core.Browser.inIframe() || Panopto.viewer.linksEnabledInIframe;
+    return (
+      Panopto.Branding.animateLoadingIndicator(Panopto.branding.accentColor),
+      (p.isHeaderVisible = function () {
+        return C;
+      }),
+      (p.toggleHeader = function (t) {
+        (C = t), e.toggle(t);
+      }),
+      p.toggleHeader(!0),
+      y.keydown(function (e) {
+        if (
+          (!e.ctrlKey &&
+            _.contains([d.VolumeUpKeyCode, d.VolumeDownKeyCode], e.keyCode) &&
+            e.stopPropagation(),
+          e.keyCode === Panopto.Core.Key.UpArrow ||
+            e.keyCode === Panopto.Core.Key.RightArrow ||
+            e.keyCode === Panopto.Core.Key.DownArrow ||
+            e.keyCode === Panopto.Core.Key.LeftArrow)
+        ) {
+          var t = y.find(".index-event:focus"),
+            n = void 0;
+          e.keyCode === Panopto.Core.Key.UpArrow ||
+          e.keyCode === Panopto.Core.Key.LeftArrow
+            ? (n = t.prev(".index-event"))
+            : (e.keyCode !== Panopto.Core.Key.DownArrow &&
+                e.keyCode !== Panopto.Core.Key.RightArrow) ||
+              (n = t.next(".index-event")),
+            n.length &&
+              (t.attr("tabindex", -1), n.focus(), n.attr("tabindex", 0)),
+            e.stopPropagation();
+        }
+      }),
+      S.toggle(E),
+      Panopto.Core.UI.Handlers.button(e, function () {
+        return n.fireTabSelected(p);
+      }),
+      e.focus(function () {
+        return n.fireTabSelected(p);
+      }),
+      (p.isSameEventRendering = function (e, t) {
+        return (
+          e.id === t.id &&
+          (void 0 === e.displayTime ||
+            void 0 === t.displayTime ||
+            e.displayTime === t.displayTime) &&
+          e.inlineEditable === t.inlineEditable &&
+          e.text === t.text &&
+          e.showUser === t.showUser &&
+          e.userDisplayName === t.userDisplayName &&
+          e.time === t.time &&
+          e.timeRange === t.timeRange &&
+          e.editable === t.editable &&
+          e.deletable === t.deletable
+        );
+      }),
+      (p.selected = function (o) {
+        if (void 0 === o) return e.hasClass("selected");
+        e.toggleClass("selected", o),
+          o
+            ? t.delay(d.FadeInterval).fadeIn(d.FadeInterval, function () {
+                var e;
+                n.resize(),
+                  null === (e = p.onSelectChangeRendered) ||
+                    void 0 === e ||
+                    e.call(p, { selected: !0 });
+              })
+            : t.fadeOut(d.FadeInterval, function () {
+                var e;
+                return null === (e = p.onSelectChangeRendered) || void 0 === e
+                  ? void 0
+                  : e.call(p, { selected: !1 });
+              }),
+          A.selected(o);
+      }),
+      (p.headerId = function () {
+        return e.attr("id");
+      }),
+      (p.resize = function (e, n) {
+        (e === f && n === h) ||
+          ((f = e), (h = n), v.css("max-height", n + "px"), t.width(e));
+      }),
+      (p.position = function (e) {
+        var t;
+        r &&
+          (_.each(i, function (n) {
+            n.time <= e && (t = n);
+          }),
+          w.highlight(t));
+      }),
+      (p.render = function (e, t, o, r, s) {
+        if ((o || e.sort(T), r)) {
+          var l = (function (e) {
+            for (
+              var t = [], n = [], o = 0, a = 0;
+              o < i.length && a < e.length;
+
+            ) {
+              var r = i[o],
+                s = e[a],
+                l = T(r, s);
+              0 === l
+                ? (p.isSameEventRendering(r, s) || (t.push(s), n.push(r)),
+                  o++,
+                  a++)
+                : l < 0
+                ? (n.push(r), o++)
+                : (t.push(s), a++);
+            }
+            for (; o < i.length; ) n.push(i[o]), o++;
+            for (; a < e.length; ) t.push(e[a]), a++;
+            return { eventsToAdd: t, eventsToRemove: n };
+          })(e);
+          (e = l.eventsToAdd),
+            _.each(l.eventsToRemove, function (e) {
+              i.splice(i.indexOf(e), 1), y.find("#" + e.id).remove();
+            });
+        }
+        _.each(e, function (e) {
+          var t;
+          "number" != typeof e.time ||
+            e.displayTime ||
+            (e.displayTime = Panopto.Core.TimeHelpers.formatDuration(
+              e.time,
+              Panopto.GlobalResources.TimeSeparator
+            )),
+            !e.creationTime ||
+              (a !== PanoptoViewer.EventType.Comment &&
+                e.type !== PanoptoViewer.EventType.Comment &&
+                e.displayTime) ||
+              ((t = Panopto.Core.TimeHelpers.toLocalPanoptoTime(
+                Panopto.Core.TimeHelpers.formatWin32EpochTimeToDate(
+                  e.creationTime
+                ),
+                Panopto.timeZone
+              )),
+              (e.displayDate = Panopto.GlobalResources.ViewerPlus_CommentTimestamp.format(
+                Panopto.Core.TimeHelpers.utcDateToFormattedString(t, "LL"),
+                Panopto.Core.TimeHelpers.utcDateToFormattedString(t, "LT"),
+                e.userDisplayName
+              ))),
+            e.isQuestionList
+              ? (e.iconCode = Panopto.Core.Constants.QuestionListIconCode)
+              : e.url &&
+                -1 !==
+                  e.url.indexOf(PanoptoViewer.Constants.YouTubeEmbedBaseUrl) &&
+                (e.iconClass = PanoptoTS.Viewer.Constants.YouTubeIconClass),
+            n.isActiveBroadcast() && (e.createdDuringWebcast = !1);
+          var o = Panopto.Core.TextHelpers.cleanTextWithHighlighting(e.text);
+          E &&
+            (o = Panopto.Core.TextHelpers.urlsToLinks(o, { preserveHtml: !0 })),
+            (e.content = Panopto.Core.TextHelpers.displayLineBreaks(o));
+        });
+        var c = _.template(m.html());
+        !r && t
+          ? ((i.length = 0),
+            _.each(e, function (e) {
+              i.push(e);
+            }),
+            y.html(c({ events: e })),
+            _.each(i, function (e) {
+              p.afterRenderItem(e, y.find("#" + e.id), !1);
+            }))
+          : _.each(e, function (e) {
+              var t,
+                n,
+                o = c({ events: [e] }),
+                a = _.findIndex(i, function (t) {
+                  return t.eventId === e.eventId;
+                }),
+                r = !1;
+              if (a >= 0) {
+                r =
+                  (n = y.find("#" + e.id)).hasClass(
+                    Panopto.Core.Constants.HighlightedClass
+                  ) && !s;
+                var l = $.parseHTML($.trim(o));
+                n.replaceWith(l), (n = $(l)), (i[a] = e);
+              } else {
+                i.push(e), i.sort(T), (r = !s), (t = i.indexOf(e));
+                var d = $.parseHTML($.trim(o));
+                0 === t
+                  ? y.prepend(d)
+                  : t === i.length - 1
+                  ? y.append(d)
+                  : y.find("#" + i[t - 1].id).after(d),
+                  (n = $(d));
+              }
+              p.afterRenderItem(e, n, r);
+            });
+      }),
+      (p.afterRenderItem = function (e, t, n) {
+        e.displayTime && Panopto.Core.UI.Handlers.button(y.find("#" + e.id), b),
+          n && w.highlight(e),
+          t
+            .find("a")
+            .unbind("click keydown")
+            .click(function (e) {
+              e.stopPropagation();
+            })
+            .keydown(function (e) {
+              e.stopPropagation();
+            });
+      }),
+      (p.remove = function (e) {
+        _.each(e, function (e) {
+          var t = y.find("#" + e.id);
+          t.slideUp(void 0, function () {
+            t.remove();
+          }),
+            i.splice(i.indexOf(e), 1);
+        });
+      }),
+      (p.toggleLoading = function (e) {
+        P.toggle(e);
+      }),
+      (p.error = function (e, t) {
+        e
+          ? (g.find(".event-tab-error-message").text(e),
+            Panopto.Core.UI.Handlers.button(
+              g.find(".event-tab-error-retry"),
+              t
+            ),
+            Panopto.Core.UI.Handlers.button(
+              g.find(".event-tab-error-cancel"),
+              function () {
+                p.error(!1);
+              }
+            ),
+            g.slideDown())
+          : g.slideUp();
+      }),
+      (p.fetch = function (e, t, n, i, r) {
+        (i = i || a),
+          p.toggleLoading(!0),
+          c.search(
+            o,
+            i,
+            e,
+            t,
+            n,
+            l,
+            !r,
+            function (e) {
+              p.render(
+                _.map(e, function (e) {
+                  return new PanoptoTS.Viewer.Data.Event(e);
+                }),
+                !0,
+                void 0,
+                void 0,
+                void 0
+              ),
+                p.error(!1),
+                p.toggleLoading(!1);
+            },
+            function () {
+              p.fetchError(e, t, n, i);
+            }
+          );
+      }),
+      (p.fetchError = function (e, t, n, o) {
+        p.error(
+          Panopto.GlobalResources.ViewerPlus_EventTab_LoadError,
+          function () {
+            p.fetch(e, t, n, o);
+          }
+        ),
+          p.toggleLoading(!1);
+      }),
+      (p.events = function () {
+        return i;
+      }),
+      p
+    );
+  }),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
+  (PanoptoLegacy.Viewer.Tabs.NotesTab = function (
+    e,
+    t,
+    n,
+    o,
+    i,
+    a,
+    r,
+    s,
+    l,
+    c,
+    d
+  ) {
+    var u,
+      p,
+      f,
+      h = Panopto.Viewer.Data,
+      m = PanoptoTS.Viewer.Constants,
+      v = !1,
+      y = PanoptoLegacy.Viewer.Tabs.EditableEventTab(
+        e,
+        t,
+        n,
+        o,
+        [],
+        PanoptoViewer.EventType.Note,
+        !0,
+        a,
+        Panopto.GlobalResources.ViewerPlus_AddNote,
+        Panopto.GlobalResources.ViewerPlus_AddNote_None,
+        Panopto.GlobalResources.ViewerPlus_Notes_SignIn,
+        Panopto.Viewer.Analytics.Labels.Note,
+        void 0,
+        l,
+        c,
+        d
+      ),
+      P = y,
+      g = Panopto.Core.Extensions.base(y),
+      S = [],
+      C = "public",
+      w = t.find("#channelSingleLabel"),
+      b = t.find("#channelSelect"),
+      T = t.find("#channelInput"),
+      A = t.find("#channelOptionTemplate"),
+      E = t.find("#togglePublic"),
+      V = t.find("#notesDownload"),
+      I = t.find("#cancelChannel"),
+      k = t.find(".event-input"),
+      R = function (e) {
+        b.val(e.value), b.change();
+      },
+      D = function (e) {
+        b.toggle(e),
+          E.toggle(s && e && r && u === p),
+          T.toggle(!e),
+          I.toggle(!e);
+      },
+      x = function (e) {
+        E.text(
+          e
+            ? Panopto.GlobalResources.ViewerPlus_MakePrivate
+            : Panopto.GlobalResources.ViewerPlus_MakePublic
+        ),
+          E.toggleClass(C, e);
+      },
+      L = function () {
+        y.toggleLoading(!0),
+          d.toggleEventPrivacy(
+            o,
+            !E.hasClass(C),
+            function (e) {
+              x(e.Public), y.error(!1), y.toggleLoading(!1);
+            },
+            function () {
+              var e = E.hasClass(C)
+                ? Panopto.GlobalResources.ViewerPlus_EventTab_TogglePrivateError
+                : Panopto.GlobalResources.ViewerPlus_EventTab_TogglePublicError;
+              y.error(e, function () {
+                L();
+              }),
+                y.toggleLoading(!1);
+            }
+          );
+      },
+      O = Panopto.GlobalResources.ViewerPlus_YourNotes.format(a.key);
+    if (
+      (w.text(O),
+      (p = h.Channel("", O)),
+      S.push(p),
+      r &&
+        _.each(r, function (e) {
+          e.value.toLowerCase() !== a.key && S.push(e);
+        }),
+      Panopto.viewer.isCustomNotesChannelEnabled &&
+        S.push(
+          h.Channel(
+            m.JoinChannelOptionValue,
+            Panopto.GlobalResources.ViewerPlus_JoinChannel
+          )
+        ),
+      b.html(_.template(A.html())({ channels: S })),
+      (f = b.find("option[value='" + m.JoinChannelOptionValue + "']")),
+      b.change(function () {
+        var e = b.val();
+        e === m.JoinChannelOptionValue
+          ? (D(!1), T.focus())
+          : ((u = _.find(S, function (t) {
+              return t.value === e;
+            })),
+            v && y.fetch(),
+            V.attr("href", M()),
+            E.toggle(s && r && e === p.value));
+      }),
+      b.keydown(function (e) {
+        return e.stopPropagation();
+      }),
+      w.toggle(1 === S.length),
+      b.toggle(S.length > 1),
+      r)
+    ) {
+      Panopto.Core.UI.Handlers.button(E, L);
+      var U = _.find(r, function (e) {
+        return e.name.toLowerCase() === a.key;
+      });
+      x(void 0 !== U), E.toggle(s);
+    }
+    T.keydown(function (e) {
+      var t,
+        n,
+        o = jQuery.trim(T.val());
+      13 === e.keyCode &&
+        (e.preventDefault(),
+        o &&
+          o !== m.JoinChannelOptionValue &&
+          ((t = _.find(S, function (e) {
+            return e.value === o;
+          })) ||
+            ((n = h.Channel(o)),
+            f.before(_.template(A.html())({ channels: [n] })),
+            S.splice(S.length - 2, 0, n),
+            T.val(""),
+            (t = n)),
+          D(!0),
+          R(t))),
+        e.stopPropagation();
+    }),
+      Panopto.Core.UI.Handlers.button(I, function () {
+        T.val(""), R(u), D(!0);
+      }),
+      (y.render = function (e, t) {
+        v && a.key && k.show(),
+          _.each(e, function (e) {
+            e.showUser = e.user !== a.key;
+          }),
+          g.render(e, t);
+      }),
+      (y.fetch = function () {
+        u === p
+          ? g.fetch()
+          : u.isUser
+          ? g.fetch("", u.value)
+          : g.fetch("", "", u.value);
+      });
+    var M = function () {
+      var e, t;
+      u === p || (u.isUser ? (e = u.value) : (t = u.value));
+      var n = { id: o, tid: i, notesUser: e, channelName: t };
+      return Panopto.Core.StringHelpers.addQueryParameter(
+        Panopto.uriScheme +
+          "://" +
+          Panopto.webServerFQDN +
+          Panopto.appRoot +
+          "/Handlers/NotesDownload.ashx",
+        n
+      );
+    };
+    return (
+      (P.submitEvent = function () {
+        var e = b.val();
+        e === m.JoinChannelOptionValue && (e = jQuery.trim(T.val())),
+          e ? g.submitEvent(e) : g.submitEvent(u.value);
+      }),
+      (y.selected = function (e) {
+        return (
+          void 0 !== e && e && !v && (k.hide(), y.fetch(), (v = !0)),
+          g.selected(e)
+        );
+      }),
+      R(S[0]),
+      P
+    );
+  }),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (Panopto.Viewer.Tabs.PlayerTabHeader = function (e, t, n, o, i) {
+    var a,
+      r,
+      s = e.find(".player-seek-text"),
+      l = !1;
+    return (
+      e.addClass(
+        o
+          ? PanoptoTS.Viewer.Constants.PrimaryTabHeaderClass
+          : PanoptoTS.Viewer.Constants.SecondaryTabHeaderClass
+      ),
+      i && e.find(".player-tab-wrapper > i").html(i),
+      Panopto.Core.UI.Handlers.hoverableParent(e, s, function (t) {
+        e.hasClass(Panopto.Core.Constants.InactiveClass) &&
+        !e.hasClass(Panopto.Core.Constants.DisabledClass) &&
+        t
+          ? (s.show(),
+            Panopto.viewer.allowMultipleSecondaryDisplay ||
+              s.css(
+                "left",
+                (e.filter(":visible").width() -
+                  s.filter(":visible").outerWidth()) /
+                  2
+              ))
+          : s.hide();
+      }),
+      {
+        available: function (t) {
+          var o = PanoptoTS.Viewer.Logic.TimelineLogic.isOnTimeline(n, t);
+          e.toggleClass(Panopto.Core.Constants.InactiveClass, !o),
+            !o && r && e.blur(),
+            (r = o);
+          var i = _.find(n, function (e) {
+            return e > t;
+          });
+          return (
+            (a = o ? void 0 : i || n[0]),
+            s.text(
+              Panopto.GlobalResources.ViewerPlus_SecondarySeekText.format(
+                Panopto.Core.TimeHelpers.formatDuration(
+                  i || n[0],
+                  Panopto.GlobalResources.TimeSeparator
+                )
+              )
+            ),
+            o
+          );
+        },
+        selected: function (t) {
+          if (void 0 === t) return l;
+          e.toggleClass(Panopto.Core.Constants.SelectedClass, t),
+            t && !l && s.hide(),
+            e.attr("aria-pressed", t),
+            (l = t);
+        },
+        owns: function (t) {
+          return (
+            1 ===
+            e.filter(function () {
+              return this === t;
+            }).length
+          );
+        },
+        id: function () {
+          return t;
+        },
+        seekTime: function () {
+          return a;
+        },
+        timeline: function (e) {
+          n = e;
+        },
+      }
+    );
+  }),
+  ((Panopto = Panopto || {}).UI = Panopto.UI || {}),
+  (Panopto.UI.Input = Panopto.UI.Input || {}),
+  (Panopto.Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
+  (PanoptoLegacy.Viewer.Tabs.SearchTab = function (e, t, n, o, i, a, r) {
+    var s,
+      l = PanoptoTS.Viewer.Constants,
+      c = [],
+      d = PanoptoLegacy.Viewer.Tabs.ViewerEventTab(
+        e,
+        t,
+        n,
+        o,
+        c,
+        PanoptoViewer.EventType.None,
+        !1,
+        Panopto.Viewer.Analytics.Labels.Search,
+        a,
+        r
+      ),
+      u = d,
+      p = Panopto.Core.Extensions.base(d),
+      f = "searchable",
+      h = $("#searchRegion"),
+      m = h.find("#searchInput"),
+      v = h.find("#searchButton"),
+      y = h.find("#clearButton"),
+      P = t.find("#searchTypeSelect"),
+      g = t.find("#searchSortSelect");
+    h.toggle(!0), d.toggleHeader(!1);
+    var S = [
+      { value: "", name: Panopto.GlobalResources.ViewerPlus_Search_All },
+    ];
+    return (
+      PanoptoCore.forEachEnum(PanoptoViewer.EventType, function (e, t) {
+        S.push({
+          value: t,
+          name: Panopto.GlobalResources[l.SearchTypeResourceString.format(e)],
+        });
+      }),
+      P.html(
+        _.template($("#searchOptionTemplate").html())({ searchOptions: S })
+      ),
+      g.html(
+        _.template($("#searchOptionTemplate").html())({
+          searchOptions: l.SearchSortOrders,
+        })
+      ),
+      m.keydown(function (e) {
+        e.keyCode === Panopto.Core.Key.Enter && d.fetch(), e.stopPropagation();
+      }),
+      m.keyup(function () {
+        h.toggleClass(f, "" !== jQuery.trim(m.val()));
+      }),
+      m.focus(function () {
+        h.toggleClass(f, "" !== jQuery.trim(m.val())), n.fireFocused();
+      }),
+      (u.setQueryText = function (e) {
+        m.val(e);
+      }),
+      P.change(function () {
+        d.fetch();
+      }),
+      P.keydown(function (e) {
+        return e.stopPropagation();
+      }),
+      g.change(function () {
+        var e = [];
+        _.each(c, function (t) {
+          e.push(t);
+        }),
+          g.val() === l.SortTimeValue
+            ? d.render(e, void 0, void 0, void 0, void 0)
+            : d.fetch();
+      }),
+      g.keydown(function (e) {
+        return e.stopPropagation();
+      }),
+      Panopto.Core.UI.Handlers.button(v, function () {
+        d.fetch();
+      }),
+      Panopto.Core.UI.Handlers.button(y, function () {
+        m.val(""), h.removeClass(f), m.focus(), d.fetch();
+      }),
+      m.attr("placeholder", Panopto.GlobalResources.ViewerPlus_SearchHeader),
+      (d.selected = function (e) {
+        if (void 0 === e) return p.selected();
+        p.selected(e), h.toggleClass(Panopto.Core.Constants.SelectedClass, e);
+      }),
+      (d.render = function (e) {
+        var n;
+        _.each(e, function (e) {
+          (e.iconClass = e.type),
+            e.type === PanoptoViewer.EventType.Note &&
+              ((i && i.key === e.user) || (e.showUser = !0));
+        }),
+          p.render(e, !0, g.val() === l.SortRelevanceValue),
+          (n = !!e.length) ||
+            t
+              .find("#searchResultsMessage")
+              .html(
+                PanoptoTS.StringHelpers.format(
+                  Panopto.GlobalResources.ViewerPlus_Search_NoResults,
+                  PanoptoTS.StringHelpers.format(
+                    "<span class='match'>{0}</span>",
+                    Panopto.Core.TextHelpers.cleanTextWithHighlighting(s)
+                  )
+                )
+              ),
+          t.find("#searchResultsMessage").toggle(!n);
+      }),
+      (d.fetch = function () {
+        (s = jQuery.trim(m.val())),
+          h.toggleClass("search-active", !!s),
+          d.toggleHeader(!!s),
+          n.fireSearchStarted(s),
+          p.fetch(s, "", "", P.val());
+      }),
+      u
+    );
+  }),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
+  (Panopto.Viewer.Tabs.SecondaryTab = function (e, t, n, o) {
+    var i,
+      a,
+      r = Panopto.Viewer.Analytics,
+      s = PanoptoTS.Viewer.Constants,
+      l = $(),
+      c = !0,
+      d = function (e) {
+        if (void 0 === e) return c;
+        (c = e),
+          i.toggleClass(Panopto.Core.Constants.DisabledClass, !c),
+          l.attr("aria-disabled", String(!c));
+      },
+      u = function (i, s) {
+        if (void 0 === i) return a.selected();
+        if ((t.toggle(i), i && !a.selected())) {
+          if (
+            Panopto.viewer.viewerWatermarkPosition &&
+            0 === e.getContent().find(".logo-while-playing").length
+          ) {
+            var c = new PanoptoViewer.WatermarkLogo(
+              Panopto.branding.embedLogo.png,
+              Panopto.viewer.viewerWatermarkPosition
+            );
+            e.getContent().append(c.getBrandElem()),
+              Panopto.viewer.viewerWatermarkPosition ===
+                PanoptoViewer.Data.ViewerWatermarkPositionOptions.TopRight &&
+                c.setOffset(50);
+          }
+          e.setContentClass(n.tabClass),
+            t.setContent(n, !1, null),
+            e.setSelectedText(n.title),
+            e.setSelectedIcon(o, n.iconClass),
+            s &&
+              r.sendEvent({
+                action: r.Actions.SecondaryTab,
+                label: n.tabClass,
+              });
+        }
+        a.selected(i), l.attr("aria-checked", String(!!i));
+      },
+      p = function (e, n, o, i) {
+        var a = t;
+        return a.setSecondaryPosition
+          ? a.setSecondaryPosition(e, n, o, i)
+          : t.setPosition(e, i);
+      },
+      f = function (e) {
+        (n = e),
+          a.timeline(e.timeline),
+          a.selected() && t.setContent(e, !1, null);
+      };
+    return {
+      getPlayer: function () {
+        return t;
+      },
+      render: function () {
+        if (n.hiddenTab) i = $();
+        else {
+          var t = _.template($("#playerTabHeaderTemplate").html().trim()),
+            r = $(t({ content: n, type: "inline", tabindex: 0 })),
+            s = $(t({ content: n, type: "flyout", tabindex: 0 }));
+          (l = r.add(s))
+            .attr("role", "menuitemradio")
+            .attr("aria-checked", "false")
+            .attr("aria-label", _.escape(n.title)),
+            e.addTab(r[0], s[0]),
+            (i = r.add(s));
+        }
+        a = Panopto.Viewer.Tabs.PlayerTabHeader(i, n.id, n.timeline, !1, o);
+      },
+      remove: function () {
+        t.remove(), i.remove();
+      },
+      position: p,
+      setPosition: p,
+      playState: function (e) {
+        t.playState(e);
+      },
+      bitrate: function (e) {
+        t.bitrate(e);
+      },
+      numericBitrate: function () {
+        return t.numericBitrate();
+      },
+      hasMBR: function () {
+        return t.hasMBR();
+      },
+      bitrateLevelOffset: function () {
+        return t.bitrateLevelOffset();
+      },
+      playSpeed: function (e) {
+        t.playSpeed(e);
+      },
+      content: function (e) {
+        if (void 0 === e) return n;
+        f(e);
+      },
+      setContent: f,
+      resize: function (e, n) {
+        t.resize(e, n);
+      },
+      available: function (e) {
+        return a.available(e);
+      },
+      timeline: function () {
+        return n.timeline;
+      },
+      relativeStartTime: function () {
+        return n.relativeStartTime;
+      },
+      absoluteStartTime: function () {
+        return n.absoluteStartTime;
+      },
+      selected: u,
+      setSelected: u,
+      id: function () {
+        return a.id();
+      },
+      owns: function (e) {
+        return a.owns(e);
+      },
+      seekTime: function () {
+        return a.seekTime();
+      },
+      pauseWhenAvailable: function () {
+        return n.pauseWhenAvailable;
+      },
+      isSessionPlaybackBlocking: function () {
+        return n.isSessionPlaybackBlocking;
+      },
+      hiddenTab: function () {
+        return n.hiddenTab;
+      },
+      adjustTimeline: function (e) {
+        var t = e - (s.TimedSyncRate / 1e3) * 1.5;
+        n.pauseWhenAvailable && n.timeline[0] > t && (n.timeline[0] = t);
+      },
+      enabled: d,
+      setEnabled: d,
+    };
+  }),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (Panopto.Viewer.Analytics = Panopto.Viewer.Analytics || {}),
+  (Panopto.Viewer.Tabs.TranscriptTab = function (e, t, n, o, i, a, r) {
+    var s = t.find("#languageSelect"),
+      l = _.template(t.find("#transcriptOptionTemplate").html()),
+      c = a.map(function (e) {
+        return {
+          code: e,
+          name:
+            PanoptoCore.ContentLanguageFriendly[
+              PanoptoCore.ContentLanguage[e]
+            ] || Panopto.GlobalResources.Admin_Captions_NoLanguage,
+        };
+      });
+    s.html(l({ languageList: c })), a.length <= 1 && s.hide();
+    var d = PanoptoLegacy.Viewer.Tabs.ViewerEventTab(
+      e,
+      t,
+      n,
+      o.id,
+      [],
+      PanoptoViewer.EventType.Transcript,
+      !0,
+      Panopto.Viewer.Analytics.Labels.Transcript,
+      i,
+      r
+    );
+    return (
+      s.change(function () {
+        d.fetch();
+      }),
+      (d.fetch = function () {
+        d.toggleLoading(!0),
+          r.getCaptions(
+            o.id,
+            i,
+            s.val(),
+            function (e) {
+              (o.captions = _.map(e, function (e) {
+                return new PanoptoTS.Viewer.Data.Event(e);
+              })),
+                d.render(o.captions, !0, void 0, void 0, void 0),
+                d.error(!1),
+                d.toggleLoading(!1);
+            },
+            function () {
+              d.fetchError(void 0, void 0, void 0, void 0), d.toggleLoading(!1);
+            }
+          );
+      }),
+      d.fetch(),
+      d
+    );
+  }),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Tabs = Panopto.Viewer.Tabs || {}),
+  (PanoptoLegacy.Viewer.Tabs.ViewerEventTab = function (
+    e,
+    t,
+    n,
+    o,
+    i,
+    a,
+    r,
+    s,
+    l,
+    c
+  ) {
+    var d = PanoptoLegacy.Viewer.Tabs.EventTab(e, t, n, o, i, a, r, s, l, c),
+      u = Panopto.Core.Extensions.base(d);
+    return (
+      (d.render = function (e, t, n, o, i) {
+        (e = _.filter(e, function (e) {
+          return !!jQuery.trim(e.text);
+        })),
+          u.render(e, t, n, o, i);
+      }),
+      d
+    );
+  }),
+  (function (e) {
+    !(function (e) {
+      !(function (e) {
+        var t = (function () {
+          function e() {}
+          return (
+            (e.create = function (e, t, n, o) {
+              return {
+                userSeekEnabled: e.userSeekEnabled,
+                setPosition: e.setPosition,
+                resize: function () {
+                  e.resize && e.resize();
+                },
+                isActiveBroadcast: e.isActiveBroadcast,
+                fireFocused: t,
+                isLive: e.isLive,
+                position: e.position,
+                getPosition: e.getPosition,
+                activePrimary: e.activePrimary,
+                activeSecondary: e.activeSecondary,
+                hotkey: e.hotkey,
+                toggleScreens: e.toggleScreens,
+                setSecondaryCount: e.setSecondaryCount,
+                reinitializeDelivery: e.reinitializeDelivery,
+                synchronize: e.synchronize,
+                viewMode: function (t) {
+                  var n;
+                  return e.viewMode && (n = e.viewMode(t)), n;
+                },
+                fireTabSelected: n,
+                fireSearchStarted: o,
+              };
+            }),
+            e
+          );
+        })();
+        e.ViewerEventTabHelpers = t;
+      })(e.Tabs || (e.Tabs = {}));
+    })(e.Viewer || (e.Viewer = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
+  (Panopto.Viewer.Data.Channel = function (e, t, n) {
+    return { value: e, name: t || e, isUser: n };
+  }),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
+  (function (e) {
+    !(function (e) {
+      !(function (e) {
+        var t = (function () {
+          function e() {}
+          return (
+            (e.createBaseContent = function (
+              e,
+              t,
+              n,
+              o,
+              i,
+              a,
+              r,
+              s,
+              l,
+              c,
+              d,
+              u
+            ) {
+              var p = (o = o || [])[0];
+              return {
+                title: e,
+                id: t,
+                tabClass: n,
+                iconClass: a,
+                iconCode: r,
+                timeline: o,
+                relativeStartTime: p,
+                absoluteStartTime: (i = i || p),
+                hiddenTab: s,
+                pauseWhenAvailable: l,
+                isSessionPlaybackBlocking: c,
+                isBroadcast: d,
+                isSecondaryPaneOnly: u,
+              };
+            }),
+            e
+          );
+        })();
+        e.ContentHelpers = t;
+      })(e.Data || (e.Data = {}));
+    })(e.Viewer || (e.Viewer = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  (function (e) {
+    !(function (t) {
+      !(function (t) {
+        var n = (function () {
+          function t(e) {
+            var t = e.Url || e.URL;
+            if (t) {
+              t = window.location.protocol + "//" + t.replace(/^.*?:\/\//, "");
+            }
+            var n = "number" != typeof e.Time,
+              o = this.constructBaseObject(e, t, n);
+            _.extend(this, o),
+              (this.url = t),
+              (this.isPdf = n),
+              (this.isQuiz = e.IsQuestionList);
+          }
+          return (
+            (t.prototype.constructBaseObject = function (t, n, o) {
+              var i =
+                  t.Caption ||
+                  (t.FileName
+                    ? decodeURIComponent(t.FileName)
+                    : Panopto.GlobalResources.ViewerPlus_Website),
+                a = t.ID || t.PublicId || t.PublicID,
+                r = [];
+              o
+                ? r.push(0)
+                : (r.push(t.Time),
+                  r.push(t.Time + PanoptoViewer.Constants.UrlEventDuration));
+              var s =
+                  -1 !== n.indexOf(PanoptoViewer.Constants.YouTubeEmbedBaseUrl),
+                l = o
+                  ? Panopto.Core.Constants.DocumentIconCode
+                  : t.IsQuestionList
+                  ? Panopto.Core.Constants.QuestionListIconCode
+                  : s
+                  ? void 0
+                  : Panopto.Core.Constants.LinkIconCode,
+                c = s ? e.Viewer.Constants.YouTubeIconClass : void 0;
+              return e.Viewer.Data.ContentHelpers.createBaseContent(
+                i,
+                a,
+                o ? "pdf" : e.Viewer.Constants.UrlTabClass,
+                r,
+                void 0,
+                c,
+                l,
+                t.IsQuestionList,
+                !o,
+                t.IsSessionPlaybackBlocking,
+                !1,
+                !0
+              );
+            }),
+            t
+          );
+        })();
+        t.Document = n;
+      })(t.Data || (t.Data = {}));
+    })(e.Viewer || (e.Viewer = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  (function (e) {
+    !(function (e) {
+      !(function (e) {
+        var t = function (e) {
+          var t = e.EventTargetType || "UserCreatedTranscript",
+            n = e.ID || e.EventID,
+            o =
+              n ||
+              (e.PublicId !== Panopto.Core.Constants.EmptyGuid && e.PublicId),
+            i = o ? "event" + o : (t + "-" + e.Time).replace(/\./gi, ""),
+            a = _.contains(["Transcript", "UserCreatedTranscript"], t),
+            r = _.contains(
+              ["ObjectVideo", "Primary", "PowerPoint", "SmartOcrToc"],
+              t
+            ),
+            s = a ? e.Data || e.Caption : r ? e.Caption : e.Caption || e.Data,
+            l = (e.UserName || "").toLowerCase(),
+            c = t.replace(" ", "");
+          "Questions" === c && (c = "Comments"),
+            (this.id = i),
+            (this.eventId = n),
+            (this.eventPublicId = e.PublicId),
+            (this.sessionId = e.SessionID),
+            (this.time = e.Time),
+            (this.creationTime = e.CreationTime),
+            (this.text = s),
+            (this.user = l),
+            (this.userDisplayName = e.UserDisplayName || l),
+            (this.type = c),
+            (this.isQuestionList = e.IsQuestionList),
+            (this.saved = !0),
+            (this.createdDuringWebcast =
+              "Comments" === c && e.CreatedDuringWebcast),
+            (this.url = e.Url);
+        };
+        e.Event = t;
+      })(e.Data || (e.Data = {}));
+    })(e.Viewer || (e.Viewer = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
+  (Panopto.Viewer.Data.Slide = function (e) {
+    return {
+      time: e.Time,
+      absoluteTime: e.AbsoluteTime,
+      queryParams: {
+        id: e.ObjectIdentifier,
+        number: e.ObjectSequenceNumber,
+        x: void 0,
+      },
+    };
+  }),
+  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
+  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
+  (Panopto.Viewer.Data.SlideDeck = function (e) {
+    var t = _.map(e, Panopto.Viewer.Data.Slide);
+    t[0].time = 0;
+    var n = [t[0].time],
+      o = PanoptoTS.Viewer.Data.ContentHelpers.createBaseContent(
+        Panopto.GlobalResources.ViewerPlus_SlidesTitle,
+        PanoptoTS.Viewer.Constants.SlideDeckId,
+        PanoptoTS.Viewer.Constants.SlideDeckTabClass,
+        n,
+        t[0].absoluteTime,
+        "",
+        "",
+        !1,
+        !1,
+        !1,
+        !1,
+        !1
+      );
+    return (o.slides = t), o;
+  }),
+  (function (e) {
+    !(function (e) {
+      !(function (e) {
+        var t = (function () {
+          function e() {}
+          return (
+            (e.convertDeliveryToModel = function (e) {
+              return e.map(function (e) {
+                var t = new AutoClientModels.TagSearchItem();
+                return (
+                  (t.content = e.Content),
+                  (t.usageCount = e.UsageCount),
+                  (t.id = e.PublicId),
+                  t
+                );
+              });
+            }),
+            e
+          );
+        })();
+        e.TagHelper = t;
+      })(e.Data || (e.Data = {}));
+    })(e.Viewer || (e.Viewer = {}));
+  })(PanoptoTS || (PanoptoTS = {})),
+  (function (e) {
+    !(function (t) {
+      !(function (t) {
+        var n = function (t, n) {
+          (this.time = t.Time),
+            (this.text = t.Caption),
+            (this.queryParams = {
+              eventTargetPID: t.ObjectPublicIdentifier,
+              sessionPID: t.SessionID,
+              number: t.ObjectSequenceNumber,
+              isPrimary:
+                "Primary" === t.EventTargetType ||
+                "SmartOcrToc" === t.EventTargetType,
+              absoluteTime: t.AbsoluteTime,
+            }),
+            (this.isSlide = "PowerPoint" === t.EventTargetType),
+            t.ObjectStreamID !== Panopto.Core.Constants.EmptyGuid
+              ? (this.tabId = t.ObjectStreamID)
+              : this.isSlide &&
+                (this.tabId = n ? n.id : e.Viewer.Constants.SlideDeckId);
+        };
+        t.Thumbnail = n;
+      })(t.Data || (t.Data = {}));
     })(e.Viewer || (e.Viewer = {}));
   })(PanoptoTS || (PanoptoTS = {})),
   ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
@@ -13924,382 +14645,7 @@ var __spreadArray =
       (w.timeConverter = R),
       w
     );
-  }),
-  (function (e) {
-    !(function (e) {
-      !(function (e) {
-        var t = (function () {
-          function e() {}
-          return (
-            (e.toLogLine = function (e, t, n, o, i) {
-              return (
-                e +
-                "\t" +
-                t +
-                "\t" +
-                n +
-                "\t" +
-                o +
-                (void 0 !== i ? "\t" + i : "")
-              );
-            }),
-            (e.fromLogLine = function (e) {
-              var t = e.split("\t");
-              return {
-                source: t[0].toLowerCase(),
-                time: parseInt(t[1]),
-                playerName: t[2],
-                type: t[3].toLowerCase(),
-                value: t[4],
-              };
-            }),
-            e
-          );
-        })();
-        (e.PlayerScriptEvent = t),
-          (function (e) {
-            (e[(e.LogInput = "loginput")] = "LogInput"),
-              (e[(e.LogOutput = "logoutput")] = "LogOutput"),
-              (e[(e.LogDefer = "logdefer")] = "LogDefer"),
-              (e[(e.None = "none")] = "None"),
-              (e[(e.LogInputAndOutput = "loginputandoutput")] =
-                "LogInputAndOutput");
-          })(e.ViewerEventSource || (e.ViewerEventSource = {})),
-          (function (e) {
-            (e[(e.Load = "load")] = "Load"),
-              (e[(e.Play = "play")] = "Play"),
-              (e[(e.Pause = "pause")] = "Pause"),
-              (e[(e.Stop = "stop")] = "Stop"),
-              (e[(e.Seek = "seek")] = "Seek"),
-              (e[(e.Speed = "speed")] = "Speed"),
-              (e[(e.Bitrate = "bitrate")] = "Bitrate"),
-              (e[(e.Fullscreen = "fullscreen")] = "Fullscreen"),
-              (e[(e.Volume = "volume")] = "Volume"),
-              (e[(e.Mute = "mute")] = "Mute");
-          })(e.ViewerEventType || (e.ViewerEventType = {}));
-      })(e.Test || (e.Test = {}));
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {})),
-  (function (e) {
-    !(function (t) {
-      !(function (t) {
-        var n = (function () {
-          function e(e) {
-            (this.script = this.parseScriptBlob(e)),
-              (this.playerNames = _.uniq(_.pluck(this.script, "playerName")));
-          }
-          return (
-            (e.prototype.getPlayerNames = function () {
-              return this.playerNames;
-            }),
-            (e.prototype.start = function (e, t, n, i, a) {
-              var r = {};
-              _.each(t, function (e) {
-                var t = $.parseHTML("<div />");
-                i.append(t), (r[e] = new o(e, $(t), n));
-              }),
-                this.beginScript(e, r, a);
-            }),
-            (e.prototype.beginScript = function (e, t, n) {
-              var o,
-                i,
-                a = this,
-                r = -1,
-                s = function () {
-                  do {
-                    r++;
-                  } while (
-                    r < a.script.length &&
-                    (!t[a.script[r].playerName] || a.script[r].source !== e)
-                  );
-                  r < a.script.length ? l() : n && n();
-                },
-                l = function () {
-                  var e,
-                    n = a.script[r];
-                  o
-                    ? (e = n.time - o - (new Date().getTime() - i))
-                    : ((i = new Date().getTime()), (o = n.time), (e = 0)),
-                    e > 30
-                      ? setTimeout(l, e - 30)
-                      : e > 4
-                      ? setTimeout(l)
-                      : (t[n.playerName].runEvent(n, o - i), s());
-                };
-              s();
-            }),
-            (e.prototype.parseScriptBlob = function (e) {
-              return _.map(e.split("\n"), function (e) {
-                return t.PlayerScriptEvent.fromLogLine(e);
-              });
-            }),
-            e
-          );
-        })();
-        t.ScriptedViewer = n;
-        var o = (function () {
-            function n(t, n, o) {
-              if ("flowplayer" === o.toLowerCase()) this.playerStub = new i(n);
-              else if ("video" === o.toLowerCase()) this.playerStub = new a(n);
-              else {
-                if ("panoptoflowplayer" != o.toLowerCase())
-                  throw "Unknown player stub " + o;
-                this.playerStub = new r(
-                  new e.Viewer.Players.FlowplayerMachine(
-                    "primary" == t.toLowerCase(),
-                    n,
-                    { resize: $.noop, togglePlaying: $.noop }
-                  )
-                );
-              }
-              this.playerName = t;
-            }
-            return (
-              (n.prototype.runEvent = function (e, n) {
-                switch (
-                  (t.PlayerScriptEvent.toLogLine(
-                    e.source,
-                    n + new Date().getTime(),
-                    e.playerName,
-                    e.type,
-                    e.value
-                  ),
-                  e.type)
-                ) {
-                  case t.ViewerEventType.Load:
-                    this.playerStub.load(e.value);
-                    break;
-                  case t.ViewerEventType.Play:
-                    this.playerStub.play();
-                    break;
-                  case t.ViewerEventType.Pause:
-                    this.playerStub.pause();
-                    break;
-                  case t.ViewerEventType.Stop:
-                    this.playerStub.stop();
-                    break;
-                  case t.ViewerEventType.Seek:
-                    this.playerStub.seek(parseFloat(e.value) || 0);
-                    break;
-                  case t.ViewerEventType.Speed:
-                    this.playerStub.speed(parseFloat(e.value) || 0);
-                    break;
-                  case t.ViewerEventType.Bitrate:
-                    this.playerStub.bitrate(parseFloat(e.value) || 0);
-                    break;
-                  case t.ViewerEventType.Fullscreen:
-                    this.playerStub.fullscreen("true" == e.value.toLowerCase());
-                    break;
-                  case t.ViewerEventType.Volume:
-                    this.playerStub.volume(parseFloat(e.value));
-                    break;
-                  case t.ViewerEventType.Mute:
-                    this.playerStub.mute("true" == e.value.toLowerCase());
-                }
-              }),
-              n
-            );
-          })(),
-          i = (function () {
-            function e(e) {
-              (this.$element = e), this.ensureInitialized();
-            }
-            return (
-              (e.prototype.load = function (t) {
-                var n = {
-                  sources: [
-                    {
-                      src: t,
-                      type:
-                        -1 !== t.indexOf(".m3u8")
-                          ? e.HLSMimeType
-                          : e.MP4MimeType,
-                    },
-                  ],
-                };
-                this.api
-                  ? this.api.load(n)
-                  : (this.api = flowplayer(this.$element, { clip: n }));
-              }),
-              (e.prototype.play = function () {
-                this.api.resume();
-              }),
-              (e.prototype.pause = function () {
-                this.api.pause();
-              }),
-              (e.prototype.stop = function () {
-                this.api.stop();
-              }),
-              (e.prototype.seek = function (e) {
-                this.api.seek(e || 0);
-              }),
-              (e.prototype.speed = function (e) {
-                this.api.speed(e);
-              }),
-              (e.prototype.bitrate = function (e) {}),
-              (e.prototype.fullscreen = function (e) {
-                e != this.api.isFullscreen && this.api.fullscreen();
-              }),
-              (e.prototype.volume = function (e) {
-                this.api.volume(e / 100);
-              }),
-              (e.prototype.mute = function () {
-                this.api.mute(!0);
-              }),
-              (e.prototype.ensureInitialized = function () {
-                flowplayer.conf.hlsjs ||
-                  (flowplayer.conf.hlsjs = { startLevel: "auto", safari: !0 });
-              }),
-              (e.MP4MimeType = "video/mp4"),
-              (e.HLSMimeType = "application/x-mpegURL"),
-              e
-            );
-          })(),
-          a = (function () {
-            function e(e) {
-              (this.video = $.parseHTML("<video />")[0]),
-                e.append(this.video),
-                (this.hls = new Hls()),
-                this.hls.attachMedia(this.video);
-            }
-            return (
-              (e.prototype.load = function (e) {
-                e.indexOf(".m3u8")
-                  ? this.hls.loadSource(e)
-                  : (this.video.src = e);
-              }),
-              (e.prototype.play = function () {
-                this.video.play();
-              }),
-              (e.prototype.pause = function () {
-                this.video.pause();
-              }),
-              (e.prototype.stop = function () {
-                this.hls.stopLoad();
-              }),
-              (e.prototype.seek = function (e) {
-                this.video.currentTime = e;
-              }),
-              (e.prototype.speed = function (e) {
-                this.video.playbackRate = e;
-              }),
-              (e.prototype.bitrate = function (e) {}),
-              (e.prototype.fullscreen = function (e) {
-                e
-                  ? this.video.requestFullscreen()
-                  : this.video.stopFullscreen();
-              }),
-              (e.prototype.volume = function (e) {
-                this.video.volume = e / 100;
-              }),
-              (e.prototype.mute = function () {
-                this.video.muted = !0;
-              }),
-              e
-            );
-          })(),
-          r = (function () {
-            function e(e) {
-              this.panoptoPlayer = e;
-            }
-            return (
-              (e.prototype.load = function (e) {
-                this.panoptoPlayer.content({
-                  url: e,
-                  isBroadcast: !1,
-                  isAudioOnly: !1,
-                });
-              }),
-              (e.prototype.play = function () {
-                this.panoptoPlayer.playState(1);
-              }),
-              (e.prototype.pause = function () {
-                this.panoptoPlayer.playState(2);
-              }),
-              (e.prototype.stop = function () {
-                this.panoptoPlayer.playState(3);
-              }),
-              (e.prototype.seek = function (e) {
-                this.panoptoPlayer.position(e);
-              }),
-              (e.prototype.speed = function (e) {
-                this.panoptoPlayer.playSpeed(e);
-              }),
-              (e.prototype.bitrate = function (e) {
-                this.panoptoPlayer.bitrate(e);
-              }),
-              (e.prototype.fullscreen = function (e) {
-                this.panoptoPlayer.isFullscreen(e);
-              }),
-              (e.prototype.volume = function (e) {
-                this.panoptoPlayer.volume(e);
-              }),
-              (e.prototype.mute = function (e) {
-                this.panoptoPlayer.muted(e);
-              }),
-              e
-            );
-          })();
-      })(t.Test || (t.Test = {}));
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {})),
-  (function (e) {
-    !(function (e) {
-      !(function (e) {
-        var t = PanoptoCore.Logging.Logger,
-          n = (function () {
-            function t() {}
-            return (
-              (t.createLogger = function (n) {
-                if (!t.source) {
-                  var a = Panopto.Core.StringHelpers.parseQueryString(
-                    window.location.search.slice(1),
-                    !1,
-                    !0
-                  );
-                  t.source = a.scriptmode
-                    ? a.scriptmode.toString().toLowerCase()
-                    : e.ViewerEventSource.None;
-                }
-                return t.source !== e.ViewerEventSource.None
-                  ? new o(t.source, n)
-                  : new i();
-              }),
-              t
-            );
-          })();
-        e.ViewerScriptLoggerFactory = n;
-        var o = (function () {
-            function n(e, t) {
-              (this.scriptMode = e), (this.playerName = t);
-            }
-            return (
-              (n.prototype.log = function (n, o, i) {
-                (n !== this.scriptMode &&
-                  (this.scriptMode != e.ViewerEventSource.LogInputAndOutput ||
-                    (n != e.ViewerEventSource.LogInput &&
-                      n != e.ViewerEventSource.LogDefer &&
-                      n != e.ViewerEventSource.LogOutput))) ||
-                  t.info(
-                    e.PlayerScriptEvent.toLogLine(
-                      n,
-                      new Date().getTime(),
-                      this.playerName,
-                      o,
-                      i
-                    )
-                  );
-              }),
-              n
-            );
-          })(),
-          i = (function () {
-            function e() {}
-            return (e.prototype.log = function (e, t, n) {}), e;
-          })();
-      })(e.Test || (e.Test = {}));
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {}));
+  });
 __extends =
   (this && this.__extends) ||
   (function () {
@@ -16170,241 +16516,6 @@ var ksdn = ksdn || {};
       }
     );
   }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
-  (Panopto.Viewer.Data.Channel = function (e, t, n) {
-    return { value: e, name: t || e, isUser: n };
-  }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
-  (function (e) {
-    !(function (e) {
-      !(function (e) {
-        var t = (function () {
-          function e() {}
-          return (
-            (e.createBaseContent = function (
-              e,
-              t,
-              n,
-              o,
-              i,
-              a,
-              r,
-              s,
-              l,
-              c,
-              d,
-              u
-            ) {
-              var p = (o = o || [])[0];
-              return {
-                title: e,
-                id: t,
-                tabClass: n,
-                iconClass: a,
-                iconCode: r,
-                timeline: o,
-                relativeStartTime: p,
-                absoluteStartTime: (i = i || p),
-                hiddenTab: s,
-                pauseWhenAvailable: l,
-                isSessionPlaybackBlocking: c,
-                isBroadcast: d,
-                isSecondaryPaneOnly: u,
-              };
-            }),
-            e
-          );
-        })();
-        e.ContentHelpers = t;
-      })(e.Data || (e.Data = {}));
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {})),
-  (function (e) {
-    !(function (t) {
-      !(function (t) {
-        var n = (function () {
-          function t(e) {
-            var t = e.Url || e.URL;
-            if (t) {
-              t = window.location.protocol + "//" + t.replace(/^.*?:\/\//, "");
-            }
-            var n = "number" != typeof e.Time,
-              o = this.constructBaseObject(e, t, n);
-            _.extend(this, o),
-              (this.url = t),
-              (this.isPdf = n),
-              (this.isQuiz = e.IsQuestionList);
-          }
-          return (
-            (t.prototype.constructBaseObject = function (t, n, o) {
-              var i =
-                  t.Caption ||
-                  (t.FileName
-                    ? decodeURIComponent(t.FileName)
-                    : Panopto.GlobalResources.ViewerPlus_Website),
-                a = t.ID || t.PublicId || t.PublicID,
-                r = [];
-              o
-                ? r.push(0)
-                : (r.push(t.Time),
-                  r.push(t.Time + PanoptoViewer.Constants.UrlEventDuration));
-              var s =
-                  -1 !== n.indexOf(PanoptoViewer.Constants.YouTubeEmbedBaseUrl),
-                l = o
-                  ? Panopto.Core.Constants.DocumentIconCode
-                  : t.IsQuestionList
-                  ? Panopto.Core.Constants.QuestionListIconCode
-                  : s
-                  ? void 0
-                  : Panopto.Core.Constants.LinkIconCode,
-                c = s ? e.Viewer.Constants.YouTubeIconClass : void 0;
-              return e.Viewer.Data.ContentHelpers.createBaseContent(
-                i,
-                a,
-                o ? "pdf" : e.Viewer.Constants.UrlTabClass,
-                r,
-                void 0,
-                c,
-                l,
-                t.IsQuestionList,
-                !o,
-                t.IsSessionPlaybackBlocking,
-                !1,
-                !0
-              );
-            }),
-            t
-          );
-        })();
-        t.Document = n;
-      })(t.Data || (t.Data = {}));
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {})),
-  (function (e) {
-    !(function (e) {
-      !(function (e) {
-        var t = function (e) {
-          var t = e.EventTargetType || "UserCreatedTranscript",
-            n = e.ID || e.EventID,
-            o =
-              n ||
-              (e.PublicId !== Panopto.Core.Constants.EmptyGuid && e.PublicId),
-            i = o ? "event" + o : (t + "-" + e.Time).replace(/\./gi, ""),
-            a = _.contains(["Transcript", "UserCreatedTranscript"], t),
-            r = _.contains(
-              ["ObjectVideo", "Primary", "PowerPoint", "SmartOcrToc"],
-              t
-            ),
-            s = a ? e.Data || e.Caption : r ? e.Caption : e.Caption || e.Data,
-            l = (e.UserName || "").toLowerCase(),
-            c = t.replace(" ", "");
-          "Questions" === c && (c = "Comments"),
-            (this.id = i),
-            (this.eventId = n),
-            (this.eventPublicId = e.PublicId),
-            (this.sessionId = e.SessionID),
-            (this.time = e.Time),
-            (this.creationTime = e.CreationTime),
-            (this.text = s),
-            (this.user = l),
-            (this.userDisplayName = e.UserDisplayName || l),
-            (this.type = c),
-            (this.isQuestionList = e.IsQuestionList),
-            (this.saved = !0),
-            (this.createdDuringWebcast =
-              "Comments" === c && e.CreatedDuringWebcast),
-            (this.url = e.Url);
-        };
-        e.Event = t;
-      })(e.Data || (e.Data = {}));
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {})),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
-  (Panopto.Viewer.Data.Slide = function (e) {
-    return {
-      time: e.Time,
-      absoluteTime: e.AbsoluteTime,
-      queryParams: {
-        id: e.ObjectIdentifier,
-        number: e.ObjectSequenceNumber,
-        x: void 0,
-      },
-    };
-  }),
-  ((Panopto = Panopto || {}).Viewer = Panopto.Viewer || {}),
-  (Panopto.Viewer.Data = Panopto.Viewer.Data || {}),
-  (Panopto.Viewer.Data.SlideDeck = function (e) {
-    var t = _.map(e, Panopto.Viewer.Data.Slide);
-    t[0].time = 0;
-    var n = [t[0].time],
-      o = PanoptoTS.Viewer.Data.ContentHelpers.createBaseContent(
-        Panopto.GlobalResources.ViewerPlus_SlidesTitle,
-        PanoptoTS.Viewer.Constants.SlideDeckId,
-        PanoptoTS.Viewer.Constants.SlideDeckTabClass,
-        n,
-        t[0].absoluteTime,
-        "",
-        "",
-        !1,
-        !1,
-        !1,
-        !1,
-        !1
-      );
-    return (o.slides = t), o;
-  }),
-  (function (e) {
-    !(function (e) {
-      !(function (e) {
-        var t = (function () {
-          function e() {}
-          return (
-            (e.convertDeliveryToModel = function (e) {
-              return e.map(function (e) {
-                var t = new AutoClientModels.TagSearchItem();
-                return (
-                  (t.content = e.Content),
-                  (t.usageCount = e.UsageCount),
-                  (t.id = e.PublicId),
-                  t
-                );
-              });
-            }),
-            e
-          );
-        })();
-        e.TagHelper = t;
-      })(e.Data || (e.Data = {}));
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {})),
-  (function (e) {
-    !(function (t) {
-      !(function (t) {
-        var n = function (t, n) {
-          (this.time = t.Time),
-            (this.text = t.Caption),
-            (this.queryParams = {
-              eventTargetPID: t.ObjectPublicIdentifier,
-              sessionPID: t.SessionID,
-              number: t.ObjectSequenceNumber,
-              isPrimary:
-                "Primary" === t.EventTargetType ||
-                "SmartOcrToc" === t.EventTargetType,
-              absoluteTime: t.AbsoluteTime,
-            }),
-            (this.isSlide = "PowerPoint" === t.EventTargetType),
-            t.ObjectStreamID !== Panopto.Core.Constants.EmptyGuid
-              ? (this.tabId = t.ObjectStreamID)
-              : this.isSlide &&
-                (this.tabId = n ? n.id : e.Viewer.Constants.SlideDeckId);
-        };
-        t.Thumbnail = n;
-      })(t.Data || (t.Data = {}));
-    })(e.Viewer || (e.Viewer = {}));
-  })(PanoptoTS || (PanoptoTS = {})),
   (function (e) {
     !(function (e) {
       !(function (e) {
@@ -17192,11 +17303,9 @@ var ksdn = ksdn || {};
           var f = n.filter(function (t) {
               return (
                 t.id !== e.id &&
-                ((n = t.start),
-                (o = i),
-                Math.abs(n - o) < 1e3 && (t.start !== i && (i = t.start), !0))
+                !!PanoptoCore.Helpers.timesAreApproxEqual(t.start, i) &&
+                (t.start !== i && (i = t.start), !0)
               );
-              var n, o;
             }).length,
             h = PanoptoCore.Extensions.MathExtensions.clamp(a, 0, f),
             v = 0,
@@ -17892,34 +18001,38 @@ var ksdn = ksdn || {};
           t,
           n,
           function (t) {
-            t &&
-              (n.show(),
-              o.hide(),
-              (function (e, t, n) {
-                var o = P[e.id];
-                o ||
-                  ((o = Panopto.Core.UI.Components.editableLabel(
-                    n,
-                    function (t) {
-                      var n = $.trim(t);
-                      if (n) {
-                        i.pushEdit();
-                        var a = _.find(i.activeState().events(), function (t) {
-                          return e.id === t.id;
-                        });
-                        h.updateName(a, n), (a.edited = !0), i.applyState();
-                      } else o.revert();
-                    },
-                    !0
-                  )),
-                  n.attr(
-                    "placeholder",
-                    Panopto.GlobalResources.ViewerPlus_EventTab_NoContent
-                  ),
-                  n.keydown(g),
-                  (P[e.id] = o)),
-                  o.resize();
-              })(e, 0, n));
+            t
+              ? (n.show(),
+                o.hide(),
+                (function (e, t, n) {
+                  var o = P[e.id];
+                  o ||
+                    ((o = Panopto.Core.UI.Components.editableLabel(
+                      n,
+                      function (t) {
+                        var n = $.trim(t);
+                        if (n) {
+                          i.pushEdit();
+                          var a = _.find(
+                            i.activeState().events(),
+                            function (t) {
+                              return e.id === t.id;
+                            }
+                          );
+                          h.updateName(a, n), (a.edited = !0), i.applyState();
+                        } else o.revert();
+                      },
+                      !0
+                    )),
+                    n.attr(
+                      "placeholder",
+                      Panopto.GlobalResources.ViewerPlus_EventTab_NoContent
+                    ),
+                    n.keydown(g),
+                    (P[e.id] = o)),
+                    o.resize();
+                })(e, 0, n))
+              : n.is(":focus") || (n.hide(), o.show());
           },
           { preserveExisting: !0 }
         );
@@ -19930,10 +20043,25 @@ __extends =
       }),
       (d.afterRenderItem = function (e, t, n) {
         u.afterRenderItem(e, t, n);
-        var o = $(l);
-        t.find(".event-text").append(o);
-        var i = t.find(".event-text-input");
-        S(i, o);
+        var i = $(l);
+        t.find(".event-text").append(i);
+        var a = t.find(".event-text-input");
+        S(a, i),
+          a.keydown(function (e) {
+            if (e.keyCode === Panopto.Core.Key.Enter) {
+              var n = $("#editTranscriptTabPane .index-event"),
+                o = n.index(t);
+              if (((n[o].tabIndex = -1), o + 1 < n.length)) {
+                var i = n[o + 1];
+                i.focus(), (i.tabIndex = 0);
+                var a = $(i).find(".event-text-input");
+                a.focus(), a.select();
+              }
+            }
+          }),
+          a.focus(function () {
+            o.setViewerPosition(e.time);
+          });
       });
     var S = function (e, t) {
       e.attr("maxlength", PanoptoTS.Viewer.Constants.CaptionMaxLength),
@@ -20750,4 +20878,4 @@ __extends =
       })(t.Tabs || (t.Tabs = {}));
     })(e.Viewer || (e.Viewer = {}));
   })(PanoptoTS || (PanoptoTS = {}));
-//# sourceMappingURL=file://seasyn/tfsbuilds/panopto_core_rel-rtc-10.5.0_x64/unofficial/20210311.11/_PublishedWebsites/WebUI/Scripts/Panopto/Bundles/Viewer.js.map
+//# sourceMappingURL=file://seasyn/tfsbuilds/panopto_core_rel-rtc-10.7.0_x64/20210407.1/_PublishedWebsites/WebUI/Scripts/Panopto/Bundles/Viewer.js.map
