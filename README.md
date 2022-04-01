@@ -4,7 +4,17 @@ Panopto Blocker is a Google Chrome extension for blocking the annoying 15-second
 
 ## Updates
 
-20.03.2021 - Updated Viewer.js with the new version
+**Since I have graduated, I can no longer maintain this extension.** 
+
+However, you can help me maintain it by following the steps below:
+
+1) Using Google Chrome, open a Panopto recording.
+2) Right click to an empty spot and select *Inspect*.
+3) Go to the *Sources* tab.
+4) Find the file named *Viewer.js*.
+5) Install the file to your local, and search for keywords such as "Disclaimer", "duration", etc.
+6) You will end up finding the constant declaration that makes you wait for 10 seconds. Set it to 0 and save the file.
+7) Fork the repository and open a pull request with the modified file.
 
 ## How it works?
 
